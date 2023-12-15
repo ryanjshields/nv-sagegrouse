@@ -1,0 +1,6 @@
+Curvature
+RoadsProximity
+Elevation
+Ruggedness 
+Slope
+Vegetation
