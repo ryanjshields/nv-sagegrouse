@@ -6,4 +6,3 @@ rescale_variables <- function(data, columns) {
   }
   return(data)
 }
-
