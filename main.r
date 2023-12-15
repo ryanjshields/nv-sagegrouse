@@ -14,3 +14,6 @@ cor_matrix_1 <- perform_multicollinearity_tests(rsf, 6:11)
 # For columns 15 to 19
 cor_matrix_2 <- perform_multicollinearity_tests(rsf, 15:19)
 
+#run model selection and averaging
+formulas <- read_model_formulas("model_formulas.txt")
+analysis_results <- complete_model_analysis(rsf, formulas, family = "binomial")
