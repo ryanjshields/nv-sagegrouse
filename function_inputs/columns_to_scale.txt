@@ -1,6 +1,5 @@
 Curvature
 RoadsProximity
 Elevation
-Ruggedness 
+Ruggedness
 Slope
-Vegetation
