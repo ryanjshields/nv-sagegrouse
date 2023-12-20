@@ -1,6 +1,7 @@
 model_selection <- function(data, output_dir = getwd()) {
   # Load necessary libraries
   library(MuMIn)
+  library (car)
 
   #A Priori Models
   m1 = glm(Use~scale_RoadsProximity + scale_Curvature + scale_Ruggedness + scale_Slope + Direction + scale_Elevation + Vegetation, data = data, family = "binomial")
@@ -24,6 +25,23 @@ model_selection <- function(data, output_dir = getwd()) {
   # Grab the name of the top 3 models from the model selection results
   top_models <- names(head(model_selection_results, 3))
 
-  # Return the top models (you can also return the entire selection results if needed)
-  return(list("top_models" = top_models))
+  # Check for multicollinearity in the top 3 models using vif() on each model object and save the results to a file
+  vif(m7)
+  vif(m2)
+  vif(m1)
+
+  # save the vif results to a file
+  write.csv(vif(m7), file.path(output_dir, "m7_vif_results.csv"))
+  write.csv(vif(m2), file.path(output_dir, "m2_vif_results.csv"))
+  write.csv(vif(m1), file.path(output_dir, "m1_vif_results.csv"))
+
+  # Run model averaging on the top 3 models
+  avgmodel <- model.avg(m7, m2, m1)
+
+  # save the model averaging results to a file
+  model_averaging_results <- summary(avgmodel)
+
+  # return the model averaging results
+  return(model_averaging_results)
+
 }

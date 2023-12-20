@@ -21,16 +21,13 @@ rsf <- convert_to_factors(rsf, factor_columns)
 column_names <- read_column_names("function_inputs\\columns_to_scale.txt")
 rsf <- rescale_variables(rsf, column_names)
 
-# Print the structure and summary of the dataframe
-str(rsf)
-summary(rsf)
-
 # Check for multicollinearity
 #cor_matrix_1 <- multicollinearity_tests(rsf, 6:11)
 #cor_matrix_2 <- multicollinearity_tests(rsf, 15:19)
 
 # Run model selection and averaging
 analysis_results <- model_selection(rsf)
+print(model_averaging_results)
 
 # Check if the model analysis was successful and proceed accordingly
 #if (!is.null(analysis_results)) {
