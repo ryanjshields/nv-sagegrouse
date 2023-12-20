@@ -1,0 +1,19 @@
+TO DO
+Run EDA on roads data
+Set up ENV file for project with db credentials and backup path
+Add logging, retention, and testing to backup script and implement env variables
+Move backup script to repo and set up task scheduler to run backup script
+Modify functions to read/write postgres and test on limited datasets
+Function to execute SQL script to set study area
+Function to add a column to lek_sites and flag active as use (1)
+Function to add 7100 random points in study area to lek_sites and flag as non use (0)
+OR new table with 7100 random points and flag as non use (0) and add active leks to it and flag as use (1)
+Move rasters to postgres (reproject on the way in)
+Function to do DEM derivatives, Roads raster, and other model builder steps and write to postgres
+Function to get intersections with use/non-use and DEM grid to postgres
+Function to rasterize the predictions column
+
+DEM processing improvements to remove seam artifacts (can I do it from Lidar? Different method?)
+Figure out why multicollinearity function isn't working
+Fix exporting charts and tables to folder
+
