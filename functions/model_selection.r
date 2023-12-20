@@ -1,7 +1,7 @@
 model_selection <- function(data, output_dir = getwd()) {
   # Load necessary libraries
   library(MuMIn)
-  library (car)
+  library(car)
 
   #A Priori Models
   m1 = glm(Use~scale_RoadsProximity + scale_Curvature + scale_Ruggedness + scale_Slope + Direction + scale_Elevation + Vegetation, data = data, family = "binomial")
@@ -31,9 +31,9 @@ model_selection <- function(data, output_dir = getwd()) {
   vif(m1)
 
   # save the vif results to a file
-  write.csv(vif(m7), file.path(output_dir, "m7_vif_results.csv"))
-  write.csv(vif(m2), file.path(output_dir, "m2_vif_results.csv"))
-  write.csv(vif(m1), file.path(output_dir, "m1_vif_results.csv"))
+  write.csv(vif(m7), file.path(output_dir, "results\\m7_vif_results.csv"))
+  write.csv(vif(m2), file.path(output_dir, "results\\m2_vif_results.csv"))
+  write.csv(vif(m1), file.path(output_dir, "results\\m1_vif_results.csv"))
 
   # Run model averaging on the top 3 models
   avgmodel <- model.avg(m7, m2, m1)
