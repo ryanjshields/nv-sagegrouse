@@ -43,5 +43,5 @@ model_selection <- function(data, output_dir = getwd()) {
 
   # return the model averaging results
   return(model_averaging_results)
-
+  
 }
