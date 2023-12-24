@@ -1,5 +1,6 @@
 TO DO
 Run EDA on roads data
+    Figure out how to download the output images from ChatGPT
 Set up ENV file for project with db credentials and backup path
 Add logging, retention, and testing to backup script and implement env variables
 Move backup script to repo and set up task scheduler to run backup script

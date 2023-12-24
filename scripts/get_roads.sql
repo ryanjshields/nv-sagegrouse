@@ -20,6 +20,7 @@ WITH NVboundary AS (
     SELECT ST_Intersection(Combined.geom, NVboundary.geom) AS geom
     FROM Combined, NVboundary
 )
-SELECT roads.*
+SELECT roads.*, cfcc_descriptions.description
 FROM roads
+JOIN cfcc_descriptions ON roads."FCC" = cfcc_descriptions.cfcc
 WHERE ST_Within(roads.geom, (SELECT geom FROM StudyArea));
