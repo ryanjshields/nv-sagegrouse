@@ -30,7 +30,7 @@ rsf$Direction            <- as.factor(rsf$direction)          # ref = "E" (alpha
 veg <- as.character(rsf$evt_phys)
 veg[is.na(veg) | veg == ""] <- "Other"
 tab <- table(veg); veg[veg %in% names(tab[tab < 10])] <- "Other"  # collapse rare classes, as in 2023
-rsf$Vegetation <- relevel(as.factor(veg), ref = "Other")
+rsf$Vegetation <- {rf <- if ("Shrubland" %in% veg) "Shrubland" else names(sort(table(veg), decreasing=TRUE))[1]; relevel(as.factor(veg), ref = rf)}
 
 # -- The 12 a priori models, verbatim ------------------------------------------
 m1  <- glm(Use ~ scale_RoadsProximity + scale_Curvature + scale_Ruggedness + scale_Slope + Direction + scale_Elevation + Vegetation, data = rsf, family = "binomial")
