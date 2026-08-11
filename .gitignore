@@ -1,0 +1,4 @@
+data-local/
+*.csv
+!versions/*.csv
+.DS_Store

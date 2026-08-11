@@ -1,0 +1,51 @@
+version: v4-2026-latest
+description: >
+  Publishable latest-data run. Methodology per McGinn et al. PLOS draft (Feb 2024),
+  with three documented deltas: seeded RNG for random points, active-only 5-km
+  study-area buffer (Dec-2023 bug fix), EVT_PHYS taken natively from current LANDFIRE.
+
+leks:
+  source: gs://ssm-nv-sagegrouse-secure/leks/          # NDOW 2020 dataset — request from NDOW to replicate
+  vintage: 2018-status                                  # swap when a fresh NDOW pull lands
+  filter: active                                        # n=725 (716 in NV + 9 outside)
+  crs: EPSG:26911                                       # NAD83 / UTM 11N
+
+study_area:
+  distribution: usfws-2015-status-review-current-range  # ScienceBase 56f96693e4b0a6037df06034
+  clip_state: NV
+  buffer_leks_km: 5
+  buffer_scope: active-only                             # DELTA vs 2023: was all-leks (acknowledged bug)
+
+random_points:
+  ratio_available_per_used: 10                          # 7,100 ~= 10 x 716 — the paper's ACTUAL design
+  seed: 20260811
+  # ERRATUM (found 2026-08-11): manuscript claims ~3,548 km2 study area at 2 pts/km2.
+  # True NV range area = 152,047 km2 (USFWS 2015 range clipped to NV, EPSG:5070).
+  # 7,100 points over 152k km2 = ~0.047/km2. The consistent interpretation is a
+  # 1:10 used:available ratio, encoded here. Sensitivity config may raise N later.
+
+covariates:
+  dem:
+    source: 3dep-1arcsec                                # fetched via pipeline/fetch-tnm.ts, latest vintage
+    resolution_m: 30
+    derivatives: [slope, aspect8, curvature, tri]
+    tri_window: 3x3                                     # 90 m physical at 30 m
+  vegetation:
+    source: landfire-latest-evt
+    attribute: EVT_PHYS                                 # native; round-2 dictionary retained as provenance only
+    collapse: 10-categories-plus-other
+  roads:
+    source: tiger-latest-nv
+    metric: euclidean-distance-m
+
+model:
+  design: use-availability logistic (use=1 leks, use=0 randoms)
+  scaling: z-scale continuous covariates
+  formulas: pipeline/r/formulas.R                       # 12 a priori GLMs, verbatim from 2023 code
+  rank: AICc
+  average: top-3
+  vif_max: 10
+
+outputs: [model_selection.csv, averaged_betas.csv, vif.csv, predictions.parquet, prediction.tif, quantile5_map.png, findings.md]
+compare_to: reports/ground-truth/plos2024-tables.md     # auto-diff against published coefficients
+snapshot_on_publish: gs://ssm-nv-sagegrouse-open/snapshots/v4/
