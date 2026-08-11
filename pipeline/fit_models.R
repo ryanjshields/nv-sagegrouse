@@ -4,9 +4,16 @@
 # Reads  data-local/design/model_input.csv
 # Writes reports/v4/{model_selection.csv, averaged_betas.csv, vif.csv}
 
-for (p in c("MuMIn", "car")) if (!requireNamespace(p, quietly = TRUE))
-  install.packages(p, repos = "https://cloud.r-project.org", quiet = TRUE)
-suppressPackageStartupMessages({ library(MuMIn); library(car) })
+if (!requireNamespace("MuMIn", quietly = TRUE))
+  install.packages("MuMIn", repos = "https://cloud.r-project.org", quiet = TRUE)
+suppressPackageStartupMessages(library(MuMIn))
+
+# VIF in base R (car::vif's numeric core): diag of the inverse correlation
+# matrix of the model matrix, intercept dropped. Equivalent for our all-additive models.
+base_vif <- function(m) {
+  mm <- model.matrix(m)[, -1, drop = FALSE]
+  diag(solve(cor(mm)))
+}
 
 root <- normalizePath(file.path(dirname(sub("--file=", "", grep("--file=", commandArgs(FALSE), value = TRUE))), ".."))
 rsf <- read.csv(file.path(root, "data-local/design/model_input.csv"))
@@ -52,8 +59,9 @@ betas$ci85_low  <- ci[, 1]
 betas$ci85_high <- ci[, 2]
 write.csv(betas, file.path(root, "reports/v4/averaged_betas.csv"))
 
-vifs <- do.call(rbind, lapply(top3_names, function(n)
-  data.frame(model = n, term = names(vif(get(n))[, 1]), gvif = vif(get(n))[, 1])))
+vifs <- do.call(rbind, lapply(top3_names, function(n) {
+  v <- base_vif(get(n)); data.frame(model = n, term = names(v), vif = v)
+}))
 write.csv(vifs, file.path(root, "reports/v4/vif.csv"), row.names = FALSE)
 
 cat("top 3 models:", paste(top3_names, collapse = ", "), "\n")
