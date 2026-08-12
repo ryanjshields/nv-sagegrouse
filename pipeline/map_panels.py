@@ -145,7 +145,7 @@ for i, (ax, lab) in enumerate(zip(axes, labels5)):
     ax.imshow(base, cmap=ListedColormap(["#e8e6e1"]), vmin=0, vmax=1,
               extent=(bnd.left, bnd.right, bnd.bottom, bnd.top))
     solo = np.where(bin_state_sa == i, 1.0, np.nan)
-    ax.imshow(solo, cmap=ListedColormap([COLORS[i]]), vmin=0, vmax=1,
+    ax.imshow(solo, cmap=ListedColormap(["#1a1a1a"]), vmin=0, vmax=1,
               extent=(bnd.left, bnd.right, bnd.bottom, bnd.top))
     nv.boundary.plot(ax=ax, color="#444", linewidth=0.5)
     ax.set_axis_off()
