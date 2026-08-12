@@ -1,96 +1,185 @@
 ---
-title: "Greater Sage-Grouse Lek Site Selection in Nevada"
-subtitle: "v4 pipeline findings — 2026 data, replicable end to end"
+title: "Predicting fine-scale lek site selection of Greater Sage-Grouse (Centrocercus urophasianus) in Nevada, USA"
+subtitle: "v4 analysis — current data, replicable pipeline · working findings document"
 date: 2026-08-11
 format:
   html:
     embed-resources: true
     toc: true
     theme: cosmo
+    fig-cap-location: bottom
 ---
 
-## What this is
+## Overview
 
-A Resource Selection Function (RSF) analysis of Greater Sage-Grouse lek site
-selection across Nevada, rebuilt as a fully replicable pipeline: every input
-fetched by script from public sources (except sensitive lek locations, held
-under NDOW agreement), every intermediate staged as GeoParquet or
-Cloud-Optimized GeoTIFF, the model step in R matching the study's twelve
-a priori GLMs, and every run reproducible byte-for-byte from a cold shell.
+We conducted a resource selection function (RSF) based on 718 known active lek
+locations throughout the state of Nevada to 1) predict areas with potential
+lekking activity and 2) quantify active lek site characteristics. We used a
+use-availability study design where each lek site was considered a sampling
+unit. Leks were the "used" points in the analysis and were compared to
+randomly generated "available" points. This document reports the current
+(v4) analysis, produced by a fully scripted pipeline in which every input is
+fetched from its authoritative public source, every intermediate is staged as
+GeoParquet or Cloud-Optimized GeoTIFF, and every run is reproducible from a
+cold start. **No lek locations appear in this document or in any public
+artifact of this project.**
 
-**No lek locations appear in this document or any public artifact.**
+## Study Area
 
-## The pipeline, in run order
+![Study area: the sage-grouse distribution range in Nevada (USFWS 2015 Status
+Review current range), with 5-km buffers around active leks falling outside
+the range.](v4/figs/study_area.png){width=55%}
 
-| Step | What it does |
-|---|---|
-| `fetch_tnm.py` | 3DEP 1-arc-second DEM tiles, vintage-deduplicated, manifested |
-| `build_dem.sh` | 30 m EPSG:5070 COG mosaic + slope, aspect, TRI |
-| `build_vrm.py` | Vector Ruggedness Measure (Sappington et al. 2007), 3×3 |
-| `fetch_landfire.py` | LANDFIRE LF2025 EVT clip via the LFPS v2 API |
-| `fetch_vectors.py` | Range, boundary, roads → EPSG:5070 GeoParquet |
-| `prepare_design.py` | Study area + seeded used/available design |
-| `extract_covariates.py` | Covariates sampled at design points |
-| `fit_models.R` | 12 GLMs → AICc → top-3 model average → reports |
+We determined the extent of the study — **152,458 km²** — using the
+sage-grouse species distribution range for the state of Nevada, USA, combined
+with a 5-km buffer around active leks that fell outside the traditional
+range. Sage-grouse inhabit rangelands throughout the state generally
+characterized as high-elevation, cool desert ecosystems with hot, dry summers
+and cold winters. Wyoming big sagebrush (*Artemisia tridentata
+wyomingensis*), low sagebrush (*A. arbuscula*), and black sagebrush
+(*A. nova*) largely dominate areas below 2,100 m in elevation; at higher
+elevations, mountain big sagebrush (*A. t. vaseyana*) is the dominant
+vegetation. The dominant conifers include Utah juniper (*Juniperus
+osteosperma*) and single-leaf pinyon pine (*Pinus monophylla*), which tend to
+colonize mid- to high-elevation and mesic sagebrush habitats.
 
-## Study area
+## Data Acquisition
 
-![](v4/figs/study_area.png){width=55%}
+Lek locations come from the state of Nevada's historical lek count dataset,
+acquired from the Nevada Department of Wildlife (NDOW) in 2020. The dataset
+includes lek center locations and annual male counts for all known leks
+throughout Nevada from 1947–2018, with sites characterized as active,
+inactive, historic, no activity, or unknown. This analysis uses leks
+categorized as **active as of 2018** and located within Nevada (n = 718),
+omitting all others. Lek data are held under agreement and are not
+redistributed; researchers may request them from NDOW.
 
-USFWS 2015 sage-grouse range clipped to Nevada plus 5-km buffers around
-active leks outside it: **152,458 km²**. Design: **718 used leks**
-(NDOW, active status) and **7,180 seeded random available points**
-(10 per used lek).
+| Input | Source & product | Vintage | Access |
+|---|---|---|---|
+| Lek locations | NDOW historical lek count dataset | counts 1947–2018 | acquired 2020, under agreement |
+| Elevation | USGS 3DEP, 1 arc-second (30 m), 72 tiles | tile vintages 2013–2026 | TNM API, 2026-08-11, manifested |
+| Vegetation | LANDFIRE LF2025 Existing Vegetation Type (EVT_PHYS) | LF2025 | LFPS API, 2026-08-11 |
+| Roads | U.S. Census TIGER/Line, Nevada primary & secondary roads | 2024 | 2026-08-11 |
+| Range polygon | USFWS 2015 Status Review current range | 2015 | ScienceBase API, 2026-08-11 |
 
-## Terrain covariates
+All acquisition is performed by pipeline scripts that write provenance
+manifests (exact URLs, publication dates, sizes) alongside the data. Note one
+departure from earlier drafts: the roads layer is TIGER primary and secondary
+roads; the 2024 draft's roads data additionally included minor and unimproved
+roads. Road proximity did not enter the top model set in either analysis.
 
-![](v4/figs/terrain.png)
+## Statistical Analysis
 
-Elevation from current 3DEP; slope and aspect via GDAL; ruggedness is the
-**Vector Ruggedness Measure** — surface-normal dispersion, a geometric
-property of terrain. We evaluated range-position focal indices and found
-them dominated by DEM-vintage-specific texture (63% cell agreement across
-DEM generations, where chance is 50%) and nearly uncorrelated with terrain
-geometry; VRM measures the real thing and is the standard in the wildlife
-habitat literature.
+### Design
 
-## Model results
+To ensure a sufficient number of random points to characterize availability
+across the study area, we generated **7,180 random points — ten per used
+lek** — as a seeded uniform sample within the study area (seed 20260811),
+making the draw exactly reproducible. Each used and available site was
+attributed with the full predictor set.
 
-![](v4/figs/betas.png)
+### Predictor variables
 
-| Term | 2024 draft | v4 (2026) |
-|---|---|---|
-| Slope | −1.42 (−1.55, −1.28) | **−1.19 (−1.34, −1.05)** |
-| Elevation | +0.78 (0.69, 0.86) | **+0.96 (0.87, 1.05)** |
-| Ruggedness | +0.14 (0.08, 0.20)¹ | **−1.02 (−1.27, −0.76)** |
+Environmental data included LANDFIRE Existing Vegetation Type physiognomy
+(EVT_PHYS) and elevation from a 30-m digital elevation model. The vegetation
+layer's categories — conifer, conifer-hardwood, exotic herbaceous, exotic
+tree-shrub, grassland, quarries–strip mines–gravel pits–well/wind pads,
+riparian, shrubland, sparsely vegetated, and other — follow the draft
+analysis, with classes rarer than 10 sites collapsed into "other." DEM
+derivatives included aspect, slope, curvature, and ruggedness. We categorized
+aspect into eight cardinal directions (N, NE, E, SE, S, SW, W, NW).
+Anthropogenic activity is represented by the Euclidean distance from each
+site to the nearest road.
 
-¹ Different instrument: the draft used a range-position focal index
-(subsequently found unstable across DEM vintages); v4 uses VRM.
+Ruggedness is the **Vector Ruggedness Measure** (VRM; Sappington et al.
+2007), computed over a 3×3 (90 m × 90 m) window from the slope and aspect
+surfaces: the dispersion of surface-normal vectors, a geometric property of
+terrain. In developing v4 we evaluated range-position focal indices of the
+form (mean − min)/(max − min) and found them dominated by DEM-generation-
+specific texture — cells classified as "rugged" agreed only 63% of the time
+across DEM vintages (chance = 50%) — and nearly uncorrelated with terrain
+geometry. VRM is the standard ruggedness measure in the wildlife-habitat
+literature and is decorrelated from slope by construction (r = 0.40 in our
+design; VIF ≤ 1.5).
 
-The slope and elevation effects replicate the 2024 draft almost exactly on
-entirely new data. Measured with VRM, ruggedness shows **strong avoidance**:
-used lek sites average VRM 0.00046 versus 0.00197 across availability —
-display grounds sit on terrain roughly four times smoother than what the
-landscape offers. Same top-3 model set (m1, m7, m2); VIF 1.0–1.5 throughout.
+![Terrain covariates at 30 m (EPSG:5070), read from the pipeline's
+Cloud-Optimized GeoTIFFs.](v4/figs/terrain.png)
 
-## Vegetation
+### Models
 
-![](v4/figs/vegetation.png)
+Continuous covariates were standardized (z-scaled). We fit the twelve a
+priori binomial GLMs of the draft analysis — additive combinations of road
+proximity, curvature, ruggedness, slope, aspect direction, elevation, and
+vegetation — ranked them by AICc, checked multicollinearity with variance
+inflation factors (all ≤ 1.5), and averaged the top three models to generate
+coefficient estimates with 85% confidence intervals.
 
-Relative to shrubland: grassland and exotic herbaceous cover sit above the
-reference (open herbaceous sites are favored for display), while conifer,
-sparsely vegetated, and riparian classes fall well below — conifer most
-strongly avoided, consistent with the encroachment literature.
+## Exploratory Data Analysis
 
-## The picture
+![Continuous predictor distributions at used and available
+sites.](v4/figs/distributions.png)
 
-Leks sit on **gentle, smooth, high, open ground** — low slope, low
-surface ruggedness, higher elevation, herbaceous-over-conifer cover. Every
-piece of that sentence is now supported by a coefficient with a clean CI,
-estimated from current public terrain and vegetation data against NDOW's
-lek register.
+The separation visible above previews every model result: used sites
+concentrate at low slope, low VRM, and higher elevation relative to
+availability.
 
-## Reproducing this
+![Vegetation physiognomy at used versus available
+sites.](v4/figs/veg_proportions.png)
+
+**Summary statistics.**
+
+{{< include v4/tables/summary_stats.md >}}
+
+**Availability-sample validation.** Following the draft's S1 approach, we
+compared the mean of the study area's pixels for each continuous variable
+(estimated by a dense 100,000-point Monte Carlo sample at full raster
+resolution) against the available-sample mean and its 85% CI:
+
+{{< include v4/tables/validation.md >}}
+
+The VRM interval misses the study-area mean by ~1% — a consequence of the
+tight CI at n = 7,180 rather than a biased draw; elevation, slope, and
+curvature are covered.
+
+## Results
+
+**Model selection.** The same three models lead the AICc ranking as in the
+draft analysis (m1, m7, m2), in slightly different order:
+
+{{< include v4/tables/model_selection.md >}}
+
+**Model-averaged coefficients** (top three models, 85% CIs):
+
+{{< include v4/tables/coefficients.md >}}
+
+![Model-averaged terrain effects: 2024 draft versus v4. Note the ruggedness
+instrument differs between analyses (draft: range-position focal index; v4:
+VRM).](v4/figs/betas.png)
+
+Lek sites were more likely to occur at **higher elevations** (model-averaged
+β = 0.96, 85% CI 0.87–1.05) and less likely to occur on **steeper slopes**
+(β = −1.19, 85% CI −1.34 – −1.05), closely replicating the draft analysis
+(elevation 0.78; slope −1.42) on entirely current data. Measured with VRM,
+lek sites show **strong avoidance of rugged terrain** (β = −1.02, 85% CI
+−1.27 – −0.76): used sites average VRM 0.00046 against 0.00197 across
+availability — display grounds sit on terrain roughly four times smoother
+than the landscape offers.
+
+![Vegetation selection relative to the shrubland
+reference.](v4/figs/vegetation.png)
+
+Relative to shrubland, grassland and exotic herbaceous classes sit above the
+reference while conifer, sparsely vegetated, and riparian classes fall well
+below, with conifer most strongly avoided — consistent with the conifer-
+encroachment literature and with the draft's vegetation ordering.
+
+Together: leks occupy **gentle, smooth, relatively high, open ground** —
+low slope, low surface ruggedness, higher elevation, herbaceous cover over
+conifer. Each element of that description carries a coefficient with a clean
+confidence interval, estimated against NDOW's lek register from current
+public terrain and vegetation data.
+
+## Reproducibility
 
 ```bash
 uv run pipeline/fetch_vectors.py
@@ -98,13 +187,17 @@ python3 pipeline/fetch_tnm.py --dataset "National Elevation Dataset (NED) 1 arc-
   --bbox="-120.01,35.0,-114.03,42.01" --manifest data/manifest-3dep-v4.json
 bash pipeline/build_dem.sh
 uv run pipeline/build_vrm.py
-python3 pipeline/fetch_landfire.py --layer LF2025_EVT --bbox "-120.01 35.0 -114.03 42.01" \
-  --email you@example.com --out data-local/landfire/evt.zip
+python3 pipeline/fetch_landfire.py --layer LF2025_EVT \
+  --bbox "-120.01 35.0 -114.03 42.01" --email you@example.com \
+  --out data-local/landfire/evt.zip
 uv run pipeline/prepare_design.py
 uv run pipeline/extract_covariates.py
 Rscript pipeline/fit_models.R
+uv run pipeline/render_figures.py && uv run pipeline/eda_figures.py
+quarto render reports/findings.qmd
 ```
 
-Lek data must be requested from the Nevada Department of Wildlife.
-A Dockerfile and CI smoke test are planned so the whole chain runs with
-one command on any machine.
+The design step is deterministic: rerunning it reproduces the design file
+byte-for-byte. Lek data must be requested from NDOW. A container image and a
+continuous-integration smoke test (small AOI) are planned so the chain runs
+with one command on any machine.
