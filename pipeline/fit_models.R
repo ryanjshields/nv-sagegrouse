@@ -34,6 +34,11 @@ rsf$Direction            <- as.factor(rsf$direction)          # ref = "E" (alpha
 veg <- as.character(rsf$evt_phys)
 veg[is.na(veg) | veg == ""] <- "Other"
 tab <- table(veg); veg[veg %in% names(tab[tab < 10])] <- "Other"  # collapse rare classes, as in 2023
+# Separation guard: any class with < 5 USED leks cannot support a stable
+# coefficient (quasi-separation produced |beta| ~ 14, SE ~ 500 in earlier fits).
+used_tab <- table(veg[rsf$use == 1])
+zero_used <- setdiff(unique(veg), names(used_tab[used_tab >= 5]))
+veg[veg %in% zero_used] <- "Other"
 rsf$Vegetation <- {rf <- if ("Shrubland" %in% veg) "Shrubland" else names(sort(table(veg), decreasing=TRUE))[1]; relevel(as.factor(veg), ref = rf)}
 
 # -- The 12 a priori models, verbatim ------------------------------------------

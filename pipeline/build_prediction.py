@@ -43,7 +43,7 @@ if ARGS.get("rugg", "vrm") == "eq1binary":
     SC["tri"] = (0.4543, 0.4979)
 
 def b(name): return float(betas.get(name, 0.0))
-DIR_BETA = {d: b(f"Direction{d}") for d in ("N", "NE", "NW", "S", "SE", "SW", "W")}  # ref E = 0
+DIR_BETA = {d: b(f"Direction{d}") for d in ("N", "NE", "NW", "S", "SE", "SW", "W", "Flat")}  # ref E = 0
 
 # Vegetation: EVT raster value -> EVT_PHYS -> beta (ref Shrubland = 0; rare->Other)
 vat = pd.read_csv(VAT_PATH)
@@ -112,11 +112,13 @@ for row0 in range(0, H, BLOCK):
         eta += (b("scale_PavedProximity") * z(rd("distpaved"), "dist_paved_m")
                 + b("scale_UnpavedProximity") * z(rd("distunpaved"), "dist_unpaved_m"))
     dir_arr = np.zeros_like(aspect)
+    flat = slope < 0.5
     for lab, (lo, hi) in {"N": (337.5, 22.5), "NE": (22.5, 67.5), "SE": (112.5, 157.5),
                           "S": (157.5, 202.5), "SW": (202.5, 247.5), "W": (247.5, 292.5),
                           "NW": (292.5, 337.5)}.items():
         m = ((aspect > lo) & (aspect <= hi)) if lo < hi else ((aspect > lo) | (aspect <= hi))
         dir_arr[m] = DIR_BETA[lab]
+    dir_arr[flat] = DIR_BETA["Flat"]
     eta += dir_arr + VEG_LUT[evt]
     p = 1.0 / (1.0 + np.exp(-eta))
     p[~mask | ~np.isfinite(p)] = -9999.0

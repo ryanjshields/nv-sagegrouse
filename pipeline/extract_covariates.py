@@ -41,7 +41,11 @@ def direction(a):
     for hi, lab in [(22.5,"N"),(67.5,"NE"),(112.5,"E"),(157.5,"SE"),(202.5,"S"),(247.5,"SW"),(292.5,"W"),(337.5,"NW"),(360.1,"N")]:
         if a <= hi: return lab
     return "N"
-pts["direction"] = pts.aspect_deg.map(direction)
+# gdaldem -zero_for_flat writes aspect 0 for flat cells, which collides with
+# true north. Flat terrain (slope < 0.5 deg) gets its own category -- leks sit
+# on flat ground, so folding flat into N would contaminate the aspect effects.
+import numpy as _np
+pts["direction"] = _np.where(pts.slope < 0.5, "Flat", pts.aspect_deg.map(direction))
 
 # EVT_PHYS: sample the LANDFIRE grid, then map pixel value -> EVT_PHYS via the CSV attribute table
 evt_tifs = sorted((D / "landfire").glob("**/*.tif"))

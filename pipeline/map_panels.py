@@ -97,20 +97,6 @@ fig.suptitle("External comparison within the study area (Spearman \u03c1 = 0.52)
 fig.savefig(FIGS / "usgs_side_by_side.png", dpi=150, bbox_inches="tight")
 plt.close(fig)
 
-# contingency: their category (rows) x our bin (cols), row-normalized
-both_ok = np.isfinite(theirs_idx) & np.isfinite(bin_state_sa)
-tab = np.zeros((len(cats), 5))
-for i in range(len(cats)):
-    for j in range(5):
-        tab[i, j] = np.sum((theirs_idx == i) & (bin_state_sa == j) & both_ok)
-row_tot = tab.sum(axis=1, keepdims=True); row_tot[row_tot == 0] = 1
-tab_pct = tab / row_tot
-labels5 = ["very low", "low", "moderate", "high", "very high"]
-cdf = pd.DataFrame(tab_pct, index=[f"USGS cat {c}" for c in cats],
-                   columns=[f"ours {l}" for l in labels5])
-with open(ROOT / "reports/v4/tables/usgs_contingency.md", "w") as f:
-    f.write(cdf.map(lambda x: f"{x:.0%}").to_markdown() + "\n")
-
 # --- Boyce P/E curve -------------------------------------------------------------
 pts = pd.read_parquet(D / "design/design_points.parquet")
 used = pts[pts.use == 1]

@@ -19,10 +19,14 @@ rsf$scale_Slope          <- as.numeric(scale(rsf$slope))
 rsf$Direction            <- as.factor(rsf$direction)
 veg <- as.character(rsf$evt_phys); veg[is.na(veg) | veg == ""] <- "Other"
 tab <- table(veg); veg[veg %in% names(tab[tab < 10])] <- "Other"
+used_tab <- table(veg[rsf$use == 1])
+veg[veg %in% setdiff(unique(veg), names(used_tab[used_tab >= 5]))] <- "Other"
 rsf$Vegetation <- relevel(as.factor(veg), ref = "Shrubland")
+rsf$scale_PavedProximity   <- as.numeric(scale(rsf$dist_paved_m))
+rsf$scale_UnpavedProximity <- as.numeric(scale(rsf$dist_unpaved_m))
 
-form <- Use ~ scale_RoadsProximity + scale_Curvature + scale_Ruggedness +
-  scale_Slope + Direction + scale_Elevation + Vegetation   # m1 (top model)
+form <- Use ~ scale_PavedProximity + scale_UnpavedProximity + scale_Curvature +
+  scale_Ruggedness + scale_Slope + Direction + scale_Elevation + Vegetation   # m13 (top model)
 
 auc <- function(y, p) { r <- rank(p); n1 <- sum(y == 1); n0 <- sum(y == 0)
   (sum(r[y == 1]) - n1 * (n1 + 1) / 2) / (n1 * n0) }
