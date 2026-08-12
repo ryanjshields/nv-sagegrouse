@@ -111,7 +111,9 @@ with open(ROOT / "reports/v4/tables/usgs_contingency.md", "w") as f:
             "index (non-habitat < 5th percentile; low 5th–25th; moderate "
             "25th–50th; high > 50th) — four classes of deliberately unequal "
             "area, unlike our five equal-area quantile bins, so the comparison "
-            "is ordinal rather than class-for-class.\n")
+            "is ordinal rather than class-for-class. Because our bins are "
+            "equal-area, every cell would read ~20% if the two maps were "
+            "unrelated; departures from 20% are the signal.\n")
 msg = (f"USGS raster: {target['name']}\n"
        f"common valid points: {len(ours):,} of 150,000\n"
        f"Spearman(ours, USGS): {rho:.3f}\n")
