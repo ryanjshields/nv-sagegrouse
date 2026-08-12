@@ -85,8 +85,24 @@ tab = tab / tab.sum(axis=1, keepdims=True)
 cdf = pd.DataFrame(tab, index=[f"USGS cat {c}" for c in cats],
                    columns=[f"ours {l}" for l in labels5])
 (ROOT / "reports/v4/tables").mkdir(parents=True, exist_ok=True)
+
+# shaded HTML table (markdown tables cannot carry cell color); blue intensity
+# scales with the row share, so the diagonal gradient reads at a glance
+def _cell(v):
+    a = min(v * 1.4, 1.0)   # max observed share ~46% -> alpha ~0.64, text stays legible
+    return (f'<td style="text-align:right;padding:4px 12px;'
+            f'background-color:rgba(46,109,164,{a:.2f})">{v:.0%}</td>')
+
+head = "".join(f'<th style="text-align:right;padding:4px 12px">{c}</th>'
+               for c in cdf.columns)
+body = "".join(
+    '<tr><th style="text-align:left;padding:4px 12px;font-weight:normal">'
+    f'{idx}</th>{"".join(_cell(v) for v in row.values)}</tr>'
+    for idx, row in cdf.iterrows())
 with open(ROOT / "reports/v4/tables/usgs_contingency.md", "w") as f:
-    f.write(cdf.map(lambda x: f"{x:.0%}").to_markdown() + "\n")
+    f.write('<table style="border-collapse:collapse;margin:0.5em 0">'
+            f'<thead><tr><th></th>{head}</tr></thead>'
+            f'<tbody>{body}</tbody></table>\n')
 msg = (f"USGS raster: {target['name']}\n"
        f"common valid points: {len(ours):,} of 150,000\n"
        f"Spearman(ours, USGS): {rho:.3f}\n")

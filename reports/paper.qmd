@@ -469,7 +469,8 @@ class.](v4/figs/boyce_curve.png){width=48%}
 habitat-selection categories, clipped to the study
 area.](v4/figs/usgs_side_by_side.png)
 
-**Cross-tabulation** (rows: USGS selection category, row-normalized): the
+**Cross-tabulation** (rows: USGS selection category, row-normalized; cell
+shading scales with each row's share): the
 gradient is monotone — 46% of the USGS lowest-selection cells fall in our
 lowest bin, and 41% of their highest-selection cells fall in our highest.
 

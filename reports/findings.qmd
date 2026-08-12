@@ -237,7 +237,10 @@ spring habitat-selection categories (ver. 3.0, 2025), the surface
 correlates at Spearman ρ = 0.53 across ~147,000 common locations — built
 from different birds, different data (GPS telemetry vs. lek locations), and
 different methods, so agreement of this size reads as convergent validity
-rather than circularity.
+rather than circularity. Row-normalized cross-tabulation (shading scales
+with each row's share):
+
+{{< include v4/tables/usgs_contingency.md >}}
 
 ![Vegetation selection relative to the shrubland
 reference.](v4/figs/vegetation.png)
