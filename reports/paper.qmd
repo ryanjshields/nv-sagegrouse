@@ -250,9 +250,12 @@ reference while conifer, sparsely vegetated, and riparian classes fell
 below, with conifer most strongly avoided. Leks were less likely to be
 located on N-, NW-, S-, SW-, and W-facing slopes relative to E-facing
 slopes. Road proximity did not significantly affect the probability of lek
-occurrence. The averaged model discriminated well between used and
-available sites (AUC = 0.80; 5-fold cross-validation AUC 0.79 ± 0.01), and
-predicted probabilities were well calibrated across deciles.
+occurrence. The averaged model discriminated well between used and available sites
+(AUC = 0.80; random 5-fold cross-validation 0.79 ± 0.01; spatially blocked
+5-fold cross-validation 0.80 ± 0.03), and predicted probabilities were well
+calibrated across deciles. Predicted probability at used leks was
+uncorrelated with peak male counts (Spearman ρ = 0.07), indicating the
+surface characterizes lek placement rather than lek size [6].
 
 ![Figure 4. Predicted probabilities of greater sage-grouse lek occurrence in
 the state of Nevada, USA. Probabilities are classified into five bins of use
