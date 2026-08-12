@@ -1,6 +1,6 @@
 # /// script
 # requires-python = ">=3.10"
-# dependencies = ["rasterio", "numpy", "pandas", "geopandas>=1.0", "pyogrio", "pyarrow", "matplotlib"]
+# dependencies = ["rasterio", "numpy", "pandas", "geopandas>=1.0", "pyogrio", "pyarrow", "matplotlib", "tabulate"]
 # ///
 """build_prediction.py -- score the study area through the averaged model.
 
@@ -37,6 +37,10 @@ TAG = ARGS.get("tag", "v4")
 betas = pd.read_csv(BETAS_PATH, index_col=0)["Estimate"]
 mi = pd.read_parquet(D / "design/model_input.parquet")
 SC = {c: (mi[c].mean(), mi[c].std()) for c in ("curvature", "dist_road_m", "elevation", "tri", "slope")}
+if ARGS.get("rugg", "vrm") == "eq1binary":
+    # The era covariate is binary 0/1: z-scale by the binary's own moments,
+    # not VRM's (which would send z(1) to ~+170 and saturate the logistic).
+    SC["tri"] = (0.4543, 0.4979)
 
 def b(name): return float(betas.get(name, 0.0))
 DIR_BETA = {d: b(f"Direction{d}") for d in ("N", "NE", "NW", "S", "SE", "SW", "W")}  # ref E = 0

@@ -35,11 +35,12 @@ incorporated 30-m resolution spatial data with the coordinate locations of
 currently active lek sites to model site selection across the species'
 152,458-km² distribution in Nevada, USA. We generated 12 a priori models
 using different covariates to predict lek occurrence. Leks were more likely
-to occur at higher elevations (model-averaged β = 0.96, 85% CI 0.87 – 1.05)
-and less likely to occur on steeper slopes (β = −1.19, 85% CI −1.34 – −1.05)
-and on rugged terrain measured by the Vector Ruggedness Measure (β = −1.02,
-85% CI −1.27 – −0.76); herbaceous cover types were favored over conifer,
-which was strongly avoided. The averaged model discriminated well (AUC =
+to occur at higher elevations (model-averaged β = 0.94, 85% CI 0.86 – 1.03)
+and less likely to occur on steeper slopes (β = −1.17, 85% CI −1.31 – −1.03)
+and on rugged terrain measured by the Vector Ruggedness Measure (β = −1.00,
+85% CI −1.26 – −0.74); herbaceous cover types were favored over conifer,
+which was strongly avoided, and leks sat modestly closer to roads than
+availability (β = −0.09, 85% CI −0.17 – −0.01). The averaged model discriminated well (AUC =
 0.80; 5-fold cross-validation 0.79 ± 0.01). The analysis is implemented as a
 fully scripted, openly licensed pipeline in which every environmental input
 is fetched from its authoritative public source and every run is exactly
@@ -239,9 +240,9 @@ vegetation contrasts relative to shrubland).
 {{< include v4/tables/coefficients.md >}}
 
 Based on the model-averaged results, leks were more likely to occur at
-higher elevations (β = 0.96, 85% CI 0.87 – 1.05) and less likely to occur
-on steeper slopes (β = −1.19, 85% CI −1.34 – −1.05) and on rugged terrain
-(VRM; β = −1.02, 85% CI −1.27 – −0.76): used lek sites averaged VRM 0.00046
+higher elevations (β = 0.94, 85% CI 0.86 – 1.03) and less likely to occur
+on steeper slopes (β = −1.17, 85% CI −1.31 – −1.03) and on rugged terrain
+(VRM; β = −1.00, 85% CI −1.26 – −0.74): used lek sites averaged VRM 0.00046
 against 0.00197 across availability — display grounds occupy terrain
 roughly four times smoother than the landscape offers. Relative to
 shrubland, grassland and exotic herbaceous cover types sat above the
@@ -253,8 +254,12 @@ occurrence. The averaged model discriminated well between used and
 available sites (AUC = 0.80; 5-fold cross-validation AUC 0.79 ± 0.01), and
 predicted probabilities were well calibrated across deciles.
 
-<!-- Figure 4 (prediction map) inserted by pipeline once the scoring pass
-completes: v4/figs/prediction_map_v4.png -->
+![Figure 4. Predicted probabilities of greater sage-grouse lek occurrence in
+the state of Nevada, USA. Probabilities are classified into five bins of use
+probability using a quantile
+classification.](v4/figs/prediction_map_v4.png){width=62%}
+
+{{< include v4/tables/prediction_bins_v4.md >}}
 
 ## Discussion
 
@@ -291,14 +296,15 @@ sage-grouse display ecology. Together these results suggest the smoothness
 of the display surface itself, distinct from slope, is a general feature of
 lek placement in prairie and shrub-steppe grouse.
 
-Roads did not significantly affect the probability of leks occurring in our
-study area, even with all road classes — dominated by unimproved and local
-roads — included in the distance surface. The type of road (and the level
-of anthropogenic disturbance) could still play a role in the relationship
-between a given road and the probability of a lek occurring [13]: unpaved
-and remotely located roads can host successful lek sites while busier,
-noisier roads may be inhospitable to lekking activity. We recommend that
-future studies model road classes separately.
+With all road classes — dominated by unimproved and local roads — included
+in the distance surface, we found a modest association between leks and
+road proximity. This is consistent with lekking activity favoring open and
+accessible sites [1, 7], and with the observation that unpaved, remotely
+located roads can host successful lek sites while busier, noisier roads may
+be inhospitable to lekking activity [13]; the class-specific structure of
+this association (openness of two-track country versus tolerance of low-use
+disturbance) is separable with class-specific distance models, which we
+identify as the immediate next analysis for this dataset.
 
 We found that leks were less likely to be located on N-, NW-, S-, SW-, and
 W-facing slopes, compared to E-facing slopes. Leks are typically found on
