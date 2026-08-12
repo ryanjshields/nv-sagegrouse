@@ -1,0 +1,387 @@
+---
+title: "Predicting fine-scale lek site selection of greater sage-grouse (Centrocercus urophasianus) in Nevada, USA"
+subtitle: "Revised draft — 2026 analysis (v4 pipeline)"
+author:
+  - "Mikiah R. McGinn¹²"
+  - "Ryan J. Shields¹"
+  - "Griffin H. Archambault¹"
+  - "Randy T. Larsen¹"
+  - "Viviane Zulian²"
+  - "Steven L. Petersen¹"
+date: 2026-08-11
+format:
+  html:
+    embed-resources: true
+    toc: true
+    theme: cosmo
+---
+
+¹ Department of Plant and Wildlife Sciences, Brigham Young University, Provo, Utah 84602.
+² Department of Applied Ecology, North Carolina State University, Raleigh, North Carolina 27695.
+
+## Abstract
+
+Following a significant population reduction and the degradation of sagebrush
+habitats throughout the Great Basin, greater sage-grouse (*Centrocercus
+urophasianus*) has become a species of conservation concern. Rangeland
+managers continue to seek ways to improve management strategies by accurately
+locating and characterizing habitat for sage-grouse, including lek site
+locations. Lek counts have proven useful for long-term population monitoring;
+understanding the selection of lek sites by sage-grouse remains a priority
+for conservation efforts. The purpose of this study is to locate areas with
+the highest potential of lek presence and identify environmental attributes
+characteristic of lek sites using a resource selection function (RSF). We
+incorporated 30-m resolution spatial data with the coordinate locations of
+currently active lek sites to model site selection across the species'
+152,458-km² distribution in Nevada, USA. We generated 12 a priori models
+using different covariates to predict lek occurrence. Leks were more likely
+to occur at higher elevations (model-averaged β = 0.96, 85% CI 0.87 – 1.05)
+and less likely to occur on steeper slopes (β = −1.19, 85% CI −1.34 – −1.05)
+and on rugged terrain measured by the Vector Ruggedness Measure (β = −1.02,
+85% CI −1.27 – −0.76); herbaceous cover types were favored over conifer,
+which was strongly avoided. The averaged model discriminated well (AUC =
+0.80; 5-fold cross-validation 0.79 ± 0.01). The analysis is implemented as a
+fully scripted, openly licensed pipeline in which every environmental input
+is fetched from its authoritative public source and every run is exactly
+reproducible. Our results are useful for rangeland managers and researchers
+in Nevada seeking to understand and improve greater sage-grouse population
+estimates using lek locations and counts.
+
+**Keywords:** habitat selection, modeling, Nevada, resource selection function
+
+## Introduction
+
+Greater sage-grouse (*Centrocercus urophasianus*; hereafter sage-grouse) is
+a sagebrush obligate bird species that relies on intact sagebrush ecosystems
+for reproduction and survival [1]. Sage-grouse populations have generally
+been in decline since the 1960s in response to the loss, fragmentation, and
+degradation of sagebrush habitat (WAFWA, 2015). Connelly and Braun (1997)
+[2] estimated that, by 1997, sage-grouse breeding populations had declined
+by 17–47% (range-wide average of 33%). Urban expansion, resource extraction,
+invasion of non-native exotic grasses, invasion of pinyon-juniper woodland,
+wildfire and novel disturbance regimes, and over-utilization of rangelands
+through excessive grazing have all contributed to the decline of sage-grouse
+[2, 5]. The potential consequence of these impacts is increased
+fragmentation and isolation of sage-grouse populations [6].
+
+Sage-grouse are a lekking bird species that utilize open areas to display
+and breed [1, 7]. Because sage-grouse congregate at lek sites during the
+breeding season, these areas are often used as a focal point for monitoring
+bird populations and establishing management priorities and conservation
+objectives [3, 8]. Lek count data can help determine the presence and/or
+abundance of nesting habitat across the surrounding landscape [6]. Active
+leks and peak counts of male sage-grouse have been linked to source habitats
+[9], suggesting that the density of sage-grouse at lekking areas is a
+reliable indicator of habitat quality [10]. Monitoring lek sites throughout
+the species range can help managers and researchers better understand and
+protect sage-grouse populations. Though some variation in methodology and
+sampling biases exists, lek monitoring is still useful for informing
+sage-grouse-related conservation decisions [11, 12]. A comprehensive
+knowledge of existing lek locations and site selection is critical for
+informed conservation and management decisions related to sage-grouse.
+
+Our objectives were to 1) predict lek locations throughout the greater
+sage-grouse range in Nevada using landscape data from currently active lek
+sites and 2) describe the characteristics of active lek sites throughout
+their range in Nevada using a resource selection function. Active leks can
+be used to understand characteristics of potentially unknown active lek
+sites and provide a basis for new areas to survey for lek counts. Many
+studies have incorporated leks in their analyses and predictions of
+sage-grouse habitat use and quality in Nevada [8, 13, 14, 15, 16, 17, 18,
+19], and recent range-wide products integrate space use, habitat selection,
+and survival at broad spatial scales to guide land-use planning [31].
+However, these studies either delineated most or all landscape variables at
+relatively coarse resolutions (1-km²), incorporated lek location data from
+shorter time frames (5–6 years), did not predict new lek locations, or
+utilized location data other than lek sites (i.e., telemetry data). Our
+study improves upon past research as it incorporates fine-scale landscape
+variables (30-m resolution), builds upon a rich statewide dataset, and
+provides land managers with specific areas to target future lek surveys and
+conservation planning.
+
+## Methods
+
+### Study Area
+
+We determined the extent of the study — **152,458 km²** — using the
+sage-grouse species distribution range for the state of Nevada, USA [32],
+combined with a 5-km buffer around active leks that fell outside the
+traditional range (Fig. 1). Sage-grouse inhabit rangelands throughout the
+state generally characterized as high elevation, cool desert ecosystems with
+hot, dry summers and cold winters. Wyoming big sagebrush (*Artemisia
+tridentata wyomingensis*), low sagebrush (*Artemisia arbuscula*), and black
+sagebrush (*Artemisia nova*) shrub species largely dominate the areas that
+fall below 2,100-m in elevation. At higher elevations, mountain big
+sagebrush (*Artemisia tridentata vaseyana*) is the dominant vegetation. The
+dominant conifers in this range include Utah juniper (*Juniperus
+osteosperma*) and single-leaf pinyon pine (*Pinus monophylla*) that tend to
+colonize mid- to high-elevation and mesic sagebrush habitats (Coates et al.,
+2020). Dominant grasses include cheatgrass (*Bromus tectorum*), bottlebrush
+squirreltail (*Elymus elymoides*), crested wheatgrass (*Agropyron
+cristatum*), Sandberg bluegrass (*Poa secunda*), and many other annual and
+perennial species.
+
+![Figure 1. Study area highlighting the distribution of the greater
+sage-grouse in the state of Nevada, USA: the distribution range and 5-km
+buffers around known active lek sites used in this
+analysis.](v4/figs/study_area.png){width=55%}
+
+### Data Acquisition
+
+To determine lek locations, we acquired the state of Nevada's historical
+lek count dataset from the Nevada Department of Wildlife (NDOW) in 2020.
+The dataset included lek center GPS locations and annual male counts for
+all known leks throughout the state of Nevada from 1947–2018. Lek sites
+were characterized as active, inactive, historic, no activity, or unknown.
+This study analyzed leks that were categorized as "active" as of 2018 and
+located within Nevada (n = 718), omitting all others.
+
+Environmental and anthropogenic data were acquired programmatically from
+their authoritative public sources: elevation from the USGS 3D Elevation
+Program (3DEP) 1 arc-second (30-m) product; vegetation from the LANDFIRE
+LF2025 Existing Vegetation Type layer [28]; roads from the U.S. Census
+Bureau's TIGER/Line dataset (all road classes, 2024 vintage); and the
+species distribution range from the USFWS 2015 Status Review current range
+[32]. Every acquisition writes a provenance manifest (source URL,
+publication date, checksum) alongside the data.
+
+### Statistical Analysis
+
+We conducted a resource selection function (RSF) based on 718 known lek
+locations throughout the state of Nevada to 1) predict areas with potential
+lekking activity and 2) quantify active lek site characteristics. We used a
+use-availability study design where each lek site was considered a sampling
+unit [20]. The leks were considered the "used" points in the analysis and
+were compared to randomly generated "available" points. We generated ten
+available points per used lek (n = 7,180) as a seeded uniform random sample
+within the study area, making the availability draw exactly reproducible.
+
+### Predictor Variables
+
+Generating RSF predictions requires measurements of multiple predictor
+variables at each "used" and "available" site. Environmental data included
+LANDFIRE vegetation cover types (Existing Vegetation Type physiognomy) [28]
+and elevation from a 30-meter digital elevation model (DEM). The vegetation
+cover layer had 10 categories: conifer, conifer-hardwood, exotic herbaceous,
+exotic tree-shrub, grassland, quarries–strip mines–gravel pits–well/wind
+pads, riparian, shrubland, sparsely vegetated, and other. DEM derivatives
+included aspect, slope, curvature, and ruggedness. We elected to use a 30-m
+DEM to examine patterns at a fine scale across the region. We accounted for
+anthropogenic activity by calculating the Euclidean distance from each site
+to the nearest road. All data processing is automated and documented in an
+openly licensed pipeline built on GDAL, Python, and R; intermediate layers
+are staged as cloud-optimized GeoTIFF and GeoParquet.
+
+We categorized aspect into eight cardinal directions: north (N), east (E),
+south (S), west (W), northeast (NE), northwest (NW), southeast (SE), and
+southwest (SW). Ruggedness was quantified with the Vector Ruggedness Measure
+(VRM) [33], computed over a 3×3 (90-m × 90-m) window from the slope and
+aspect surfaces. VRM measures the dispersion of surface-normal vectors — a
+geometric property of terrain — and is decorrelated from slope by
+construction (r = 0.40 in our design), making it well suited to models that
+include both terms; it is the standard ruggedness metric in wildlife
+habitat analysis [33].
+
+The roads dataset comprised all Census TIGER/Line road classes (MTFCC
+schema), including local roads and unimproved vehicular trails, which
+dominate road length within the study area. As in previous analyses of this
+system, we treated all roads as equal and modeled the Euclidean distance to
+the nearest road on the DEM grid to ensure cell-location continuity with
+the elevation-derived rasters. Finally, elevation, aspect, slope,
+curvature, ruggedness, distance to roads, and vegetation cover types were
+sampled at each used and available location. To validate that we had enough
+random points to assess available habitat, we compared the mean of the
+study area's pixels for each continuous variable (estimated with a dense
+100,000-point Monte Carlo sample at full raster resolution) against the
+available-sample mean and its 85% confidence interval (S1 Table).
+
+### Resource Selection Function
+
+We calculated the prediction values for the RSF using logistic regression
+with used (n = 718) and available (n = 7,180) points. Prior to running the
+models, we checked for multicollinearity among explanatory variables and
+found no pairwise correlation more extreme than |0.6|. We then generated 12
+a priori models (Table 3) using different combinations of the covariates.
+In R [29], we fit each model with the base `glm` function and ranked models
+by AICc using the MuMIn package [34]. We tested our top three models'
+variance inflation factors (VIF) to further inspect for multicollinearity,
+considering VIF > 10 indicative of collinearity [22, 27]; all variables in
+all top models had VIF < 1.6. To account for the uncertainty inherent in
+model selection, we averaged beta coefficients from our top three models to
+generate lek site predictions (Table 4). Model discrimination was assessed
+with the area under the ROC curve on the fitted model average and under
+5-fold cross-validation of the top model, and calibration was inspected by
+deciles of predicted probability.
+
+To generate prediction values across the study area, the averaged model was
+applied directly to the covariate rasters: every 30-m cell in the study
+area was scored in blocked array computation, producing a probability
+surface that was then classified into five bins of use probability using a
+quantile classification (Fig. 4).
+
+## Results
+
+Our statewide results are based on 718 active lek sites and 7,180 randomly
+generated available points. The models that included ruggedness, slope,
+direction (aspect), elevation, and vegetation cover types carried the most
+AICc weight, as these explanatory variables occurred in all top three
+models (Table 3). We found less support for road proximity and curvature.
+VIF for the top three models indicated limited correlation among
+explanatory variables (1.0–1.6).
+
+**Table 3.** Model selection for the 12 a priori models.
+
+{{< include v4/tables/model_selection.md >}}
+
+**Table 4.** Model-averaged covariate effects (top three models, 85% CIs;
+vegetation contrasts relative to shrubland).
+
+{{< include v4/tables/coefficients.md >}}
+
+Based on the model-averaged results, leks were more likely to occur at
+higher elevations (β = 0.96, 85% CI 0.87 – 1.05) and less likely to occur
+on steeper slopes (β = −1.19, 85% CI −1.34 – −1.05) and on rugged terrain
+(VRM; β = −1.02, 85% CI −1.27 – −0.76): used lek sites averaged VRM 0.00046
+against 0.00197 across availability — display grounds occupy terrain
+roughly four times smoother than the landscape offers. Relative to
+shrubland, grassland and exotic herbaceous cover types sat above the
+reference while conifer, sparsely vegetated, and riparian classes fell
+below, with conifer most strongly avoided. Leks were less likely to be
+located on N-, NW-, S-, SW-, and W-facing slopes relative to E-facing
+slopes. Road proximity did not significantly affect the probability of lek
+occurrence. The averaged model discriminated well between used and
+available sites (AUC = 0.80; 5-fold cross-validation AUC 0.79 ± 0.01), and
+predicted probabilities were well calibrated across deciles.
+
+<!-- Figure 4 (prediction map) inserted by pipeline once the scoring pass
+completes: v4/figs/prediction_map_v4.png -->
+
+## Discussion
+
+Using fine spatial resolution information, our study builds upon a
+statewide data set providing land managers specific information to help
+identify and locate lek sites. This can help direct search effort for
+locating leks, and potentially better direct conservation efforts toward
+improving surrounding nesting cover that is critical for sage-grouse
+nesting success. It is well known that sage-grouse are highly associated
+with sagebrush for many life history stages [13, 14, 15, 16, 17, 18, 19].
+We found herbaceous cover types (grassland, exotic herbaceous) favored over
+the shrubland reference at lek sites, consistent with the open, disturbed
+character of display areas [1, 7]; vegetation patterns that influence
+nesting occur at much broader scales, and males primarily select display
+areas in response to hens' preference for proximal nesting habitat.
+
+We found strong avoidance of conifer cover at lek sites. This aligns with
+the active management literature on pinyon-juniper expansion: sage-grouse
+respond favorably to conifer removal, selecting nesting and brood sites
+near treatment areas with improved survival, making lek-scale conifer
+avoidance directly actionable for treatment prioritization.
+
+Leks were less likely to occur on steeper slopes and on rugged terrain, and
+more likely at higher elevations. Earlier work in Nevada reported mixed
+relationships among slope, elevation, and ruggedness [13, 14, 16, 18], and
+Coates et al. (2020) [18] found sage-grouse avoided rugged terrain in all
+seasons. Our results, measured with a geometric ruggedness instrument
+(VRM), are consistent with that avoidance and with the most recent work in
+a congeneric lekking system: Lautenbach et al. (2025) [35] found
+sharp-tailed grouse leks located in less rugged terrain with greater
+herbaceous cover, and proposed mechanisms — female detection of displaying
+males and sound propagation across smooth terrain — that apply equally to
+sage-grouse display ecology. Together these results suggest the smoothness
+of the display surface itself, distinct from slope, is a general feature of
+lek placement in prairie and shrub-steppe grouse.
+
+Roads did not significantly affect the probability of leks occurring in our
+study area, even with all road classes — dominated by unimproved and local
+roads — included in the distance surface. The type of road (and the level
+of anthropogenic disturbance) could still play a role in the relationship
+between a given road and the probability of a lek occurring [13]: unpaved
+and remotely located roads can host successful lek sites while busier,
+noisier roads may be inhospitable to lekking activity. We recommend that
+future studies model road classes separately.
+
+We found that leks were less likely to be located on N-, NW-, S-, SW-, and
+W-facing slopes, compared to E-facing slopes. Leks are typically found on
+less inclined surfaces, which would suggest that aspect would have minimal
+effect on lek location; however, easterly sites could have higher soil
+moisture conditions that would potentially influence surrounding plant
+community structure important for sage-grouse habitat. Precipitation was
+not a covariate included in our analysis; we recommend future studies
+incorporate climatic variables to further examine this relationship.
+
+A vital consideration for managers tasked with conserving habitat for a
+species that exhibits seasonal variation in habitat selection is that the
+area occupied at a specific time is less than the total area required for
+the species to persist [30]. The discovery and incorporation of new leks in
+models could improve the accuracy of research at fine spatial scales and
+help guide managers in their conservation efforts [17]. Leks are often
+central to the annual range for nonmigratory sage-grouse populations [3].
+Previous research by Coates et al. (2013) [8] demonstrated the utility of
+lek-centered management in Nevada, where protected areas centered at leks
+with radii of 7.5 km included almost all seasonal space use for most
+populations. The success of that approach depends on managers knowing the
+location of nearly all leks in a given area [8] — which our predictions
+directly support.
+
+### Management Implications
+
+These data can be useful for rangeland managers in the state of Nevada
+seeking to thoroughly understand and improve sage-grouse population
+estimates through lek locations. Our study could lead to the discovery of
+unknown leks, improving estimates, projections, and connectivity analyses
+for Nevada populations. Our findings can help direct limited resources to
+the areas that would benefit most, by delineating the most suitable lek
+locations across the state. Because the analysis is a scripted, openly
+licensed pipeline operating entirely on public environmental data (lek
+locations by agency agreement), it can be re-run as new LANDFIRE, 3DEP, and
+lek-status data are released, and applied directly to other populations of
+sage-grouse across their geographic range where large lek datasets exist.
+
+## Acknowledgements
+
+We would like to thank the Nevada Department of Wildlife (NDOW) for their
+financial support and for sharing information and data critical to the
+success of this study. Specifically, we appreciate M. Freese (NDOW Wildlife
+Biologist) for their participation and feedback throughout this study. We
+also thank S. Espinosa for their assistance with data sharing. We
+appreciate Brigham Young University (BYU) and North Carolina State
+University for providing funding, resources, and access to laboratory and
+computing facilities, including the Geospatial Habitat Analysis Lab at BYU.
+Our work was supported by the Nevada Department of Wildlife through the
+Wildlife Heritage Grant (#22-21) and Brigham Young University, Provo, Utah.
+
+## References
+
+References [1]–[30] as in the 2024 draft (Knick 2003; Crawford 2004;
+Connelly 2011; Coates 2013; Kirol 2015; Van Horne 1983; WAFWA 2015; Knick
+2013; Coates 2014; Coates 2016; Ricca 2018; O'Donnell 2019; Coates 2020;
+Coates 2021; Manly 2007; Aldridge & Boyce 2007; Aldridge 2008; Carpenter
+2010; Fedy 2014; Fedy 2015; Baxter 2017; LANDFIRE; R Core Team; Mortelliti
+2010), with the following updates and additions:
+
+- [21] *removed* (ESRI ArcGIS Pro no longer used; processing described in
+  Methods is implemented in GDAL, Python, and R — pipeline archived at
+  github.com/ryanjshields/nv-sagegrouse).
+- [28] LANDFIRE. LF2025 Existing Vegetation Type layer. 2026.
+- [29] R Core Team. R: A language and environment for statistical
+  computing. R Foundation for Statistical Computing; 2026.
+- [31] Milligan MC, et al. Greater sage-grouse habitat of Nevada and
+  northeastern California — integrating space use, habitat selection, and
+  survival indices to guide areas for habitat management. USGS Open-File
+  Report 2024-1018; 2024.
+- [32] U.S. Fish and Wildlife Service. Greater Sage-Grouse 2015 USFWS
+  Status Review current range. USGS ScienceBase; 2015.
+- [33] Sappington JM, Longshore KM, Thompson DB. Quantifying landscape
+  ruggedness for animal habitat analysis: a case study using bighorn sheep
+  in the Mojave Desert. J Wildl Manage 2007;71(5):1419–1426.
+- [34] Bartoń K. MuMIn: multi-model inference. R package; 2026.
+- [35] Lautenbach JM, et al. Landscape features and seasonal habitat
+  predict lek site selection and lek size of a Tympanuchus grouse.
+  Ecosphere 2025;16:e70517.
+
+## Supporting Information
+
+**S1 Table.** Comparison of the available-sample mean and the study-area
+mean of each continuous variable used in the RSF.
+
+{{< include v4/tables/validation.md >}}
