@@ -346,7 +346,12 @@ negative values indicate counter-prediction. The surface was also
 externally compared against the U.S. Geological Survey's independent,
 telemetry-based spring habitat selection categories for Nevada and
 northeastern California (ver. 3.0, 2025) [40] at 150,000 seeded random
-locations.
+locations. That product classes the landscape into four percentile
+thresholds of a habitat-selection index — non-habitat (below the 5th
+percentile), low (5th–25th), moderate (25th–50th), and high (above the
+50th) — classes of deliberately unequal area, so we compare against our
+five equal-area quantile bins ordinally (rank correlation and a
+row-normalized cross-tabulation) rather than class-for-class.
 
 To generate prediction values across the study area, the averaged model was
 applied directly to the covariate rasters: every 30-m cell in the study
@@ -445,9 +450,10 @@ against the final prediction surface, the continuous Boyce index was 0.92
 predicted-suitability gradient, and cells in the highest probability class
 hold leks at more than six times the rate their area alone would predict. Externally, the surface correlated positively with the USGS
 telemetry-based spring habitat selection categories (Fig. 14; Spearman
-ρ = 0.53 at ~147,000 common locations): 46% of the USGS lowest-selection cells fell in
-our lowest quantile bin and 41% of their highest-selection cells in our
-highest — aligned with independent data while retaining the complementary,
+ρ = 0.53 at ~147,000 common locations): 46% of the cells the USGS classes
+as non-habitat fell in our lowest quantile bin and 41% of their
+high-habitat cells in our highest — aligned with independent data while
+retaining the complementary,
 lek-specific information of this analysis. In the vegetation-change
 sensitivity analysis, 35 of 718 used leks (4.9%) changed physiognomy class
 between LANDFIRE eras (8 showing the shrubland-to-herbaceous transition
@@ -470,9 +476,9 @@ habitat-selection categories, clipped to the study
 area.](v4/figs/usgs_side_by_side.png)
 
 **Cross-tabulation** (rows: USGS selection category, row-normalized; cell
-shading scales with each row's share): the
-gradient is monotone — 46% of the USGS lowest-selection cells fall in our
-lowest bin, and 41% of their highest-selection cells fall in our highest.
+shading scales with each row's share): the gradient is monotone — 46% of
+USGS non-habitat falls in our lowest bin, and 41% of their high-habitat
+cells fall in our highest.
 
 {{< include v4/tables/usgs_contingency.md >}}
 

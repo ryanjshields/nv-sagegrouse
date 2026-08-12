@@ -82,7 +82,11 @@ for i, c in enumerate(cats):
     for j in range(5):
         tab[i, j] = np.sum((theirs == c) & (our_bin == j))
 tab = tab / tab.sum(axis=1, keepdims=True)
-cdf = pd.DataFrame(tab, index=[f"USGS cat {c}" for c in cats],
+# official class names from the release's FGDC metadata (percentile classes
+# of the HSI: <5th, 5th-25th, 25th-50th, >50th)
+USGS_NAMES = {1: "non-habitat", 2: "low habitat", 3: "moderate habitat",
+              4: "high habitat"}
+cdf = pd.DataFrame(tab, index=[f"USGS {USGS_NAMES.get(c, f'cat {c}')}" for c in cats],
                    columns=[f"ours {l}" for l in labels5])
 (ROOT / "reports/v4/tables").mkdir(parents=True, exist_ok=True)
 
@@ -102,7 +106,12 @@ body = "".join(
 with open(ROOT / "reports/v4/tables/usgs_contingency.md", "w") as f:
     f.write('<table style="border-collapse:collapse;margin:0.5em 0">'
             f'<thead><tr><th></th>{head}</tr></thead>'
-            f'<tbody>{body}</tbody></table>\n')
+            f'<tbody>{body}</tbody></table>\n\n'
+            "USGS classes are percentile thresholds of their habitat-selection "
+            "index (non-habitat < 5th percentile; low 5th–25th; moderate "
+            "25th–50th; high > 50th) — four classes of deliberately unequal "
+            "area, unlike our five equal-area quantile bins, so the comparison "
+            "is ordinal rather than class-for-class.\n")
 msg = (f"USGS raster: {target['name']}\n"
        f"common valid points: {len(ours):,} of 150,000\n"
        f"Spearman(ours, USGS): {rho:.3f}\n")

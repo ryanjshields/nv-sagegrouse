@@ -89,7 +89,10 @@ im1 = axes[1].imshow(theirs_idx, cmap=cat_cmap, vmin=-0.5, vmax=len(cats) - 0.5,
                      extent=(bnd.left, bnd.right, bnd.bottom, bnd.top))
 axes[1].set_title("USGS spring habitat-selection categories\n(telemetry-based, ver. 3.0 2025)", fontsize=10)
 cb1 = fig.colorbar(im1, ax=axes[1], shrink=0.5, ticks=range(len(cats)))
-cb1.ax.set_yticklabels([f"category {c}" for c in cats], fontsize=7)
+# official class names (FGDC metadata): percentile thresholds of the HSI
+USGS_NAMES = {1: "non-habitat", 2: "low habitat", 3: "moderate habitat",
+              4: "high habitat"}
+cb1.ax.set_yticklabels([USGS_NAMES.get(c, f"category {c}") for c in cats], fontsize=7)
 for ax in axes:
     nv.boundary.plot(ax=ax, color="#444", linewidth=0.6)
     ax.set_axis_off()
