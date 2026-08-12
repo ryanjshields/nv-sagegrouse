@@ -350,6 +350,11 @@ classification.](v4/figs/prediction_map_v4.png){width=62%}
 
 {{< include v4/tables/prediction_bins_v4.md >}}
 
+![Each quantile class isolated (equal-area by construction). The
+highest-probability class alone constitutes the survey-targeting product:
+one-fifth of the study area capturing the terrain-and-vegetation conditions
+of active leks.](v4/figs/prediction_bins_multiples.png)
+
 ![Fine-scale structure of the prediction surface: the statewide map with a
 60-km window (Tuscarora Mountains area, selected for terrain diversity)
 resolved at full 30-m detail.](v4/figs/prediction_zoom.png)
