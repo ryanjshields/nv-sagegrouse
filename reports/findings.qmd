@@ -171,8 +171,9 @@ formulations:
 {{< include v4/tables/coefficients.md >}}
 
 ![Model-averaged coefficients with 85% CIs. Red = negative, blue =
-positive; open symbols mark effects whose 85% CI crosses
-zero.](v4/figs/forest.png)
+positive; open symbols mark effects whose 85% CI crosses zero. Vegetation
+(Veg:) rows are contrasts vs shrubland; aspect rows are contrasts vs
+east-facing slopes.](v4/figs/forest.png){width=75%}
 
 Lek sites were more likely to occur at **higher elevations** (model-averaged
 β = 0.94, 85% CI 0.85–1.03) and less likely to occur on **steeper slopes**

@@ -399,7 +399,9 @@ vegetation contrasts relative to shrubland).
 
 ![Model-averaged coefficients with 85% CIs (forest plot). Red indicates
 negative estimates and blue positive; open symbols mark effects whose 85%
-CI crosses zero.](v4/figs/forest.png){width=70%}
+CI crosses zero. Vegetation (Veg:) rows are contrasts relative to
+shrubland; aspect rows are contrasts relative to east-facing
+slopes.](v4/figs/forest.png){width=70%}
 
 ![Marginal response curves from the top model: predicted probability of lek
 occurrence across each covariate's observed range, others held at
