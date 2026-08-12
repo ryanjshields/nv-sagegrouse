@@ -1,0 +1,5 @@
+[tool.pytest.ini_options]
+testpaths = ["."]
+markers = [
+  "slow: geopandas-dependent or subprocess-heavy tests that CI may skip with -m 'not slow'",
+]

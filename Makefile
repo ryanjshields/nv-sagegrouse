@@ -4,8 +4,11 @@
 SHELL := /bin/bash
 EMAIL ?= you@example.com
 
+TEST_DEPS := --with pytest --with numpy --with pandas --with rasterio --with scipy \
+  --with geopandas --with pyarrow --with pyogrio
+
 help:
-	@echo "targets: vectors dem vrm landfire roads design extract fit predict validate report v4 smoke"
+	@echo "targets: vectors dem vrm landfire roads design extract fit predict validate report v4 smoke test"
 
 vectors:
 	uv run pipeline/fetch_vectors.py
@@ -57,3 +60,24 @@ v4: vectors dem vrm landfire roads design extract fit predict validate report
 
 smoke:
 	bash pipeline/smoke_test.sh
+
+# Unit tests run on synthetic data only -- no lek data, no data-local/, CI-safe.
+# The consistency checker needs reports/v4/*.csv and exits 2 if they are absent
+# (see tests/FINDINGS.md F1).
+test: test-unit test-r test-consistency
+
+test-unit:
+	uv run $(TEST_DEPS) pytest tests/ -v
+
+test-unit-fast:
+	uv run $(TEST_DEPS) pytest tests/ -v -m "not slow"
+
+test-r:
+	Rscript tests/test_r_models.R
+
+test-consistency:
+	uv run tests/check_consistency.py --quiet-warnings
+
+# Full listing including every untraced number in the reports.
+test-consistency-verbose:
+	uv run tests/check_consistency.py

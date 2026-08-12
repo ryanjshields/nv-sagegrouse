@@ -1,6 +1,11 @@
 data-local/
 *.csv
 !versions/*.csv
+# v4 report artifacts: aggregate statistics only (betas, AUCs, deciles, VIF --
+# never coordinates). Committed so CI can verify every number the manuscript
+# quotes (tests/check_consistency.py).
+!reports/v4/*.csv
 .DS_Store
 .vscode/
 reports/*.html
+__pycache__/

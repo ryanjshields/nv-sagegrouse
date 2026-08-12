@@ -1,0 +1,56 @@
+"model","term","vif"
+"m13","scale_PavedProximity",1.04172084908779
+"m13","scale_UnpavedProximity",1.10631684192108
+"m13","scale_Curvature",1.01224146552934
+"m13","scale_Ruggedness",1.21496988698618
+"m13","scale_Slope",1.63427776739691
+"m13","DirectionFlat",1.66970542430223
+"m13","DirectionN",1.57147205573254
+"m13","DirectionNE",1.59659310418655
+"m13","DirectionNW",1.7109192795083
+"m13","DirectionS",1.55667637996632
+"m13","DirectionSE",1.79860443060838
+"m13","DirectionSW",1.55189848457919
+"m13","DirectionW",1.72148543590051
+"m13","scale_Elevation",1.5075347118173
+"m13","VegetationExotic Herbaceous",1.0643333701551
+"m13","VegetationExotic Tree-Shrub",1.06403494499519
+"m13","VegetationGrassland",1.03393687649558
+"m13","VegetationOther",1.21656879384383
+"m13","VegetationRiparian",1.08394375726983
+"m14","scale_PavedProximity",1.01770496402227
+"m14","scale_Curvature",1.01220787954874
+"m14","scale_Ruggedness",1.21376299304286
+"m14","scale_Slope",1.59138849359621
+"m14","DirectionFlat",1.66770482702632
+"m14","DirectionN",1.57134607221837
+"m14","DirectionNE",1.59651943938006
+"m14","DirectionNW",1.71089156222019
+"m14","DirectionS",1.55648342780079
+"m14","DirectionSE",1.7976223673864
+"m14","DirectionSW",1.55176725440507
+"m14","DirectionW",1.72137276503775
+"m14","scale_Elevation",1.49914449186207
+"m14","VegetationExotic Herbaceous",1.06431931413774
+"m14","VegetationExotic Tree-Shrub",1.06402953172656
+"m14","VegetationGrassland",1.03390054714334
+"m14","VegetationOther",1.21536968143409
+"m14","VegetationRiparian",1.0838934053867
+"m15","scale_UnpavedProximity",1.08081175757445
+"m15","scale_Curvature",1.01223696893976
+"m15","scale_Ruggedness",1.21486579662216
+"m15","scale_Slope",1.63407692729124
+"m15","DirectionFlat",1.66943277581651
+"m15","DirectionN",1.57123983955003
+"m15","DirectionNE",1.59617303225099
+"m15","DirectionNW",1.71089112271204
+"m15","DirectionS",1.55623430398697
+"m15","DirectionSE",1.79842595132549
+"m15","DirectionSW",1.55186911329307
+"m15","DirectionW",1.72103107677173
+"m15","scale_Elevation",1.50458369343753
+"m15","VegetationExotic Herbaceous",1.06413597078895
+"m15","VegetationExotic Tree-Shrub",1.06217668854545
+"m15","VegetationGrassland",1.02563700240502
+"m15","VegetationOther",1.21380415212863
+"m15","VegetationRiparian",1.08362945351653

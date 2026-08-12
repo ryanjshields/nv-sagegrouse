@@ -343,10 +343,12 @@ the fitted model average, under random
 cross-validation (k-means coordinate blocks), and calibration was inspected
 by deciles of predicted probability. The final surface was evaluated with
 the continuous Boyce index [41, 42], a presence-only measure appropriate to
-use–availability designs: the range of predicted probabilities is
-partitioned into classes, and each class's predicted-to-expected (P/E)
-ratio is computed as the proportion of used leks falling in the class
-divided by the proportion of the study area the class occupies. The index
+use–availability designs: a moving window is swept across the range of
+predicted probabilities (ten overlapping classes, each spanning one-fifth
+of the range [42]), and each class's predicted-to-expected (P/E) ratio is
+computed as the proportion of used leks falling in the class divided by
+the proportion of the study area the class occupies; because the windows
+overlap, adjacent classes deliberately share observations. The index
 is the Spearman rank correlation between P/E and class midpoint and ranges
 from −1 to 1; values near 1 indicate lek density rises monotonically with
 predicted suitability, 0 indicates a surface no better than chance, and

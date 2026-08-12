@@ -1,0 +1,4 @@
+"metric","value"
+"AUC (full model average)",0.807153498188251
+"AUC (5-fold CV, top model)",0.799831009900665
+"CV sd",0.00781147831532344

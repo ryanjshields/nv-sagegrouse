@@ -1,0 +1,11 @@
+"metric","value"
+"spatial-block AUC fold 1",0.777
+"spatial-block AUC fold 2",0.834
+"spatial-block AUC fold 3",0.835
+"spatial-block AUC fold 4",0.744
+"spatial-block AUC fold 5",0.812
+"spatial-block AUC mean",0.8
+"spatial-block AUC sd",0.039
+"random-fold AUC (reference)",0.799831009900665
+"lek-size Spearman (p_hat vs PEAKMALE)",0.041
+"n leks with counts",718
