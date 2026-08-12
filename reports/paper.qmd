@@ -40,16 +40,16 @@ classes. Leks were more likely
 to occur at higher elevations (model-averaged β = 0.94, 85% CI 0.85 – 1.03)
 and less likely to occur on steeper slopes (β = −1.31, 85% CI −1.47 – −1.16),
 on rugged terrain measured by the Vector Ruggedness Measure (β = −1.02, 85%
-CI −1.28 – −0.76), and on level ground lacking measurable slope (β = −1.20).
+CI −1.27 – −0.76), and on level ground lacking measurable slope (β = −1.20).
 Grassland cover was favored over the shrubland reference (β = 0.44, 85% CI
-0.16 – 0.72), while conifer cover held fewer than five of 718 lek sites and,
+0.15 – 0.72), while conifer cover held fewer than five of 718 lek sites and,
 pooled with other rarely used classes, was strongly avoided. Distinguishing
 road classes revealed opposing associations: leks sat farther from paved
-roads (β = 0.10, 85% CI 0.03 – 0.17) and, more weakly, closer to unpaved
+roads (β = 0.10, 85% CI 0.03 – 0.16) and, more weakly, closer to unpaved
 roads and vehicular trails (β = −0.09, 85% CI −0.19 – 0.01). The averaged
 model discriminated well (AUC = 0.81; spatially blocked cross-validation
-0.80 ± 0.04) and its predictions were insensitive to post-2018 vegetation
-change at lek sites. The analysis is implemented as a fully scripted, openly
+0.80 ± 0.04) and, excepting an attenuated grassland effect, its
+predictions were robust to post-2018 vegetation change at lek sites. The analysis is implemented as a fully scripted, openly
 licensed pipeline in which every environmental input is fetched from its
 authoritative public source and every run is exactly reproducible. Our results are useful for rangeland managers and researchers
 in Nevada seeking to understand and improve greater sage-grouse population
@@ -379,12 +379,12 @@ reference values.](v4/figs/response_curves.png)
 Based on the model-averaged results, leks were more likely to occur at
 higher elevations (β = 0.94, 85% CI 0.85 – 1.03) and less likely to occur
 on steeper slopes (β = −1.31, 85% CI −1.47 – −1.16) and on rugged terrain
-(VRM; β = −1.02, 85% CI −1.28 – −0.76); mean VRM at used lek sites was
+(VRM; β = −1.02, 85% CI −1.27 – −0.76); mean VRM at used lek sites was
 0.00046 against 0.00197 across availability. Level ground lacking
 measurable slope — playa and lake-bed surfaces — was also strongly avoided
-(Flat; β = −1.20, 85% CI −1.49 – −0.91): leks occupy gentle, but not
+(Flat; β = −1.20, 85% CI −1.48 – −0.91): leks occupy gentle, but not
 featureless, terrain. Relative to shrubland, grassland cover was selected
-(β = 0.44, 85% CI 0.16 – 0.72); exotic herbaceous cover trended positive
+(β = 0.44, 85% CI 0.15 – 0.72); exotic herbaceous cover trended positive
 without reaching significance (β = 0.20, 85% CI −0.06 – 0.46); exotic
 tree-shrub and riparian classes were avoided; and conifer cover contained
 fewer than five of the 718 used leks — near-complete absence — entering the
@@ -396,9 +396,9 @@ sites.](v4/figs/veg_proportions.png) Leks were less likely to be
 located on NE-, NW-, SW-, and W-facing slopes relative to E-facing slopes;
 effects for N- and S-facing slopes did not differ from the reference at the
 85% level. Road classes showed opposing associations: leks sat farther from
-paved roads than availability (β = 0.10, 85% CI 0.03 – 0.17), while the
+paved roads than availability (β = 0.10, 85% CI 0.03 – 0.16), while the
 association with unpaved roads and vehicular trails was negative but did
-not exclude zero (β = −0.09, 85% CI −0.19 – 0.01; lek sites averaged 896 m
+not exclude zero (β = −0.09, 85% CI −0.19 – 0.01; lek sites averaged 711 m
 from the nearest unpaved route). Curvature carried a significant negative
 coefficient (β = −0.42, 85% CI −0.55 – −0.29), indicating avoidance of
 locally convex microtopography.
@@ -438,7 +438,7 @@ gradient is monotone — 46% of the USGS lowest-selection cells fall in our
 lowest bin, and 41% of their highest-selection cells fall in our highest.
 
 {{< include v4/tables/usgs_contingency.md >}} Predicted probability at used leks was
-uncorrelated with peak male counts (Spearman ρ = 0.07), indicating the
+uncorrelated with peak male counts (Spearman ρ = 0.04), indicating the
 surface characterizes lek placement rather than lek size [6].
 
 ![Figure 8. Predicted probabilities of greater sage-grouse lek occurrence in
@@ -514,8 +514,9 @@ suggesting that road class carries more ecological information for lek
 placement than road presence alone; the unpaved association, however, was
 weak and should not be over-interpreted.
 
-We found that leks were less likely to be located on N-, NW-, S-, SW-, and
-W-facing slopes, compared to E-facing slopes. Leks are typically found on
+We found that leks were less likely to be located on NE-, NW-, SW-, and
+W-facing slopes, and on flat aspectless ground, compared to E-facing
+slopes. Leks are typically found on
 less inclined surfaces, which would suggest that aspect would have minimal
 effect on lek location; however, easterly sites could have higher soil
 moisture conditions that would potentially influence surrounding plant

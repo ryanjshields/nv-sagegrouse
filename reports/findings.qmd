@@ -170,8 +170,8 @@ instrument differs between analyses (draft: range-position focal index; v4:
 VRM).](v4/figs/betas.png)
 
 Lek sites were more likely to occur at **higher elevations** (model-averaged
-β = 0.96, 85% CI 0.87–1.05) and less likely to occur on **steeper slopes**
-(β = −1.19, 85% CI −1.34 – −1.05), closely replicating the draft analysis
+β = 0.94, 85% CI 0.85–1.03) and less likely to occur on **steeper slopes**
+(β = −1.31, 85% CI −1.47 – −1.16), consistent with the draft analysis
 (elevation 0.78; slope −1.42) on entirely current data. Measured with VRM,
 lek sites show **strong avoidance of rugged terrain** (β = −1.02, 85% CI
 −1.27 – −0.76): used sites average VRM 0.00046 against 0.00197 across
@@ -180,7 +180,7 @@ than the landscape offers.
 
 **Model diagnostics.** Discrimination and out-of-sample stability were
 assessed with the area under the ROC curve: **AUC = 0.81** for the full
-model average, and **0.791 ± 0.012** under 5-fold cross-validation of the top
+model average, and **0.80 ± 0.01** under 5-fold cross-validation of the top
 model — good discrimination that holds out of sample. Calibration by decile
 of predicted probability tracks the identity line:
 
@@ -204,7 +204,9 @@ direct answer.
 reference.](v4/figs/vegetation.png)
 
 Relative to shrubland, grassland and exotic herbaceous classes sit above the
-reference while conifer, sparsely vegetated, and riparian classes fall well
+reference while riparian and exotic tree-shrub classes fall below and
+conifer — holding fewer than five of 718 used leks — pools into the
+strongly avoided rare-class category, which sits well
 below, with conifer most strongly avoided — consistent with the conifer-
 encroachment literature and with the draft's vegetation ordering.
 

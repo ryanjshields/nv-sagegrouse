@@ -60,7 +60,8 @@ out <- data.frame(
              "spatial-block AUC sd", "random-fold AUC (reference)",
              "lek-size Spearman (p_hat vs PEAKMALE)", "n leks with counts"),
   value = c(round(sp_auc, 3), round(mean(sp_auc), 3), round(sd(sp_auc), 3),
-            0.791, round(size_cor, 3), nrow(m)))
+            read.csv(file.path(root, "reports/v4/diagnostics.csv"))$value[2],
+            round(size_cor, 3), nrow(m)))
 write.csv(out, file.path(root, "reports/v4/spatial_validation.csv"), row.names = FALSE)
 cat("spatial-block AUC:", round(mean(sp_auc), 3), "+/-", round(sd(sp_auc), 3),
     "(folds:", paste(round(sp_auc, 2), collapse = " "), "| held-out used per fold:",
