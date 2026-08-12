@@ -33,9 +33,10 @@ the highest potential of lek presence and identify environmental attributes
 characteristic of lek sites using a resource selection function (RSF). We
 incorporated 30-m resolution spatial data with the coordinate locations of
 currently active lek sites to model site selection across the species'
-152,458-km² distribution in Nevada, USA. We generated 15 a priori models
-using different covariate combinations, including models distinguishing
-paved from unpaved road classes, to predict lek occurrence. Leks were more likely
+152,458-km² distribution in Nevada, USA. We fit fifteen candidate models
+to predict lek occurrence: twelve a priori covariate combinations and a
+planned second-stage decomposition distinguishing paved from unpaved road
+classes. Leks were more likely
 to occur at higher elevations (model-averaged β = 0.94, 85% CI 0.85 – 1.03)
 and less likely to occur on steeper slopes (β = −1.31, 85% CI −1.47 – −1.16),
 on rugged terrain measured by the Vector Ruggedness Measure (β = −1.02, 85%
@@ -357,7 +358,9 @@ curvature, and vegetation cover types occurred in all top three models. VIF
 for the top three models indicated limited correlation among explanatory
 variables (1.0–1.8).
 
-**Table 3.** Model selection for the 15 a priori models.
+**Table 3.** Model selection for the fifteen candidate models (twelve a
+priori formulations, m1–m12; three second-stage road-class models,
+m13–m15).
 
 {{< include v4/tables/model_selection.md >}}
 
