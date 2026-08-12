@@ -98,28 +98,17 @@ fig.suptitle(f"External comparison within the study area (Spearman \u03c1 = {flo
 fig.savefig(FIGS / "usgs_side_by_side.png", dpi=150, bbox_inches="tight")
 plt.close(fig)
 
-# --- Boyce P/E curve -------------------------------------------------------------
-pts = pd.read_parquet(D / "design/design_points.parquet")
-used = pts[pts.use == 1]
-with rasterio.open(D / "dem/nv_prediction_v4_5070.tif") as src:
-    p_used = np.array([v[0] for v in src.sample(zip(used.x, used.y))], dtype="float64")
-p_used = p_used[np.isfinite(p_used) & (p_used >= 0)]
-lo, hi = valid.min(), np.quantile(valid, 0.999)
-width = (hi - lo) / 5.0
-mids, F = [], []
-for start in np.linspace(lo, hi - width, 10):
-    end = start + width
-    exp = ((valid >= start) & (valid < end)).mean()
-    if exp > 0:
-        mids.append(start + width / 2)
-        F.append(((p_used >= start) & (p_used < end)).mean() / exp)
+# --- Boyce P/E curve (data computed once, in boyce.py) ---------------------------
+_pe = pd.read_csv(ROOT / "reports/v4/boyce_pe.csv")
+mids, F, _boyce = _pe.midpoint.values, _pe.pe.values, _pe.boyce.iloc[0]
 fig, ax = plt.subplots(figsize=(5.2, 4))
 ax.plot(mids, F, "-o", color="#3a6ea5")
 ax.axhline(1.0, color="#999", linestyle="--", linewidth=0.8)
+ax.annotate("P/E = 1: leks occur at the rate area alone predicts",
+            xy=(mids[len(mids) // 2], 1.0), xytext=(0, 5),
+            textcoords="offset points", fontsize=7.5, color="#666")
 ax.set_xlabel("predicted probability (class midpoint)")
-ax.set_ylabel("predicted-to-expected ratio")
-_rk = lambda a: pd.Series(a).rank().values
-_boyce = float(np.corrcoef(_rk(np.array(mids)), _rk(np.array(F)))[0, 1])
+ax.set_ylabel("predicted-to-expected (P/E) ratio of lek occurrence")
 ax.set_title(f"Boyce evaluation: P/E by probability class (index = {_boyce:.2f})", fontsize=10)
 fig.savefig(FIGS / "boyce_curve.png", dpi=150, bbox_inches="tight")
 plt.close(fig)

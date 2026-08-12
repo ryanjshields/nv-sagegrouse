@@ -113,7 +113,9 @@ Cloud-Optimized GeoTIFFs.](v4/figs/covariate_multiples.png)
 Continuous covariates were standardized (z-scaled). We fit fifteen
 candidate binomial GLMs — the draft's twelve a priori combinations plus a
 second-stage decomposition distinguishing paved from unpaved road distance —
-ranked them by AICc, checked multicollinearity with variance inflation
+ranked them by AICc (Akaike's information criterion corrected for small
+sample size — lower is better, and models within ~2 of the best have
+comparable support), checked multicollinearity with variance inflation
 factors (all ≤ 1.8), and averaged the top three models to generate
 coefficient estimates with 85% confidence intervals.
 
@@ -165,6 +167,10 @@ formulations:
 
 {{< include v4/tables/coefficients.md >}}
 
+![Model-averaged coefficients with 85% CIs. Red = negative, blue =
+positive; open symbols mark effects whose 85% CI crosses
+zero.](v4/figs/forest.png)
+
 ![Model-averaged terrain effects: 2024 draft versus v4. Note the ruggedness
 instrument differs between analyses (draft: range-position focal index; v4:
 VRM).](v4/figs/betas.png)
@@ -179,9 +185,12 @@ availability — display grounds sit on terrain roughly four times smoother
 than the landscape offers.
 
 **Model diagnostics.** Discrimination and out-of-sample stability were
-assessed with the area under the ROC curve: **AUC = 0.81** for the full
-model average, and **0.80 ± 0.01** under 5-fold cross-validation of the top
-model — good discrimination that holds out of sample. Calibration by decile
+assessed with the area under the ROC curve (AUC: the probability that a
+randomly drawn used site receives a higher predicted value than a randomly
+drawn available site — 0.5 is a coin flip, 1.0 is perfect ranking):
+**AUC = 0.81** for the full model average, and **0.80 ± 0.01** under 5-fold
+cross-validation of the top model — good discrimination that holds out of
+sample. Calibration by decile
 of predicted probability tracks the identity line:
 
 ![Calibration: mean predicted probability versus observed use rate, by
@@ -194,11 +203,33 @@ demonstrating the model transfers across space rather than memorizing lek
 neighborhoods. **Lek-size check**: Spearman correlation between predicted
 probability and peak male counts at the 718 leks is 0.04 — the surface
 predicts placement, not size, consistent with the classic density–quality
-distinction (Van Horne 1983). A Boyce index on the full surface and external correlation
-against the USGS 2024/2025 habitat rasters are the remaining planned
-checks; reviewer history on this team's prior RSF (Baum et al. 2022)
-indicates spatial structure will be a review focus, and it now has a
-direct answer.
+distinction (Van Horne 1983). Reviewer history on this team's prior RSF
+(Baum et al. 2022) indicates spatial structure will be a review focus, and
+it now has a direct answer.
+
+**Surface evaluation.** The prediction surface itself was evaluated with
+the **continuous Boyce index** (Boyce et al. 2002; Hirzel et al. 2006), the
+standard presence-only check for use–availability models. The predicted
+probability range is cut into classes; for each class the
+predicted-to-expected (P/E) ratio is the share of used leks falling in the
+class divided by the share of study-area cells in it — P/E = 1 means leks
+occur there at exactly the rate the class's area would predict by chance.
+The index is the rank correlation between P/E and class midpoint: −1 to 1,
+where 1 means lek density climbs steadily with predicted suitability and 0
+means the surface is no better than chance. Ours is **0.92**:
+
+{{< include v4/tables/boyce.md >}}
+
+![Predicted-to-expected ratio by probability class. Everything above the
+dashed line captures more leks than its areal share
+predicts.](v4/figs/boyce_curve.png){width=55%}
+
+**External comparison.** Against the USGS independent, telemetry-based
+spring habitat-selection categories (ver. 3.0, 2025), the surface
+correlates at Spearman ρ = 0.53 across ~147,000 common locations — built
+from different birds, different data (GPS telemetry vs. lek locations), and
+different methods, so agreement of this size reads as convergent validity
+rather than circularity.
 
 ![Vegetation selection relative to the shrubland
 reference.](v4/figs/vegetation.png)

@@ -306,7 +306,8 @@ distinguishing paved (TIGER MTFCC S1100, S1200, S1630) from unpaved (S1400
 local roads and S1500 vehicular trails) distances, to separate a
 disturbance hypothesis (leks avoid high-use roads) from an openness
 hypothesis (unimproved routes co-occur with the open terrain leks favor).
-All fifteen models entered a single AICc ranking; we note the road-class
+All fifteen models entered a single ranking by Akaike's information
+criterion corrected for small sample size (AICc); we note the road-class
 models were specified after the combined-roads models had been examined,
 and their support should be read in that light.
 In R [29], we fit each model with the base `glm` function and ranked models
@@ -319,12 +320,21 @@ using the full (zero-substitution) average in MuMIn, and report 85%
 confidence intervals consistent with AIC-based selection (Table 4). Model discrimination was assessed
 with the area under the ROC curve on the fitted model average, under random
 5-fold cross-validation, and under spatially blocked 5-fold
-cross-validation (k-means coordinate blocks); calibration was inspected by
-deciles of predicted probability; the final surface was evaluated with the
-continuous Boyce index; and the surface was externally compared against the
-U.S. Geological Survey's independent, telemetry-based spring habitat
-selection categories for Nevada and northeastern California (ver. 3.0,
-2025) [40] at 150,000 seeded random locations.
+cross-validation (k-means coordinate blocks), and calibration was inspected
+by deciles of predicted probability. The final surface was evaluated with
+the continuous Boyce index [41, 42], a presence-only measure appropriate to
+use–availability designs: the range of predicted probabilities is
+partitioned into classes, and each class's predicted-to-expected (P/E)
+ratio is computed as the proportion of used leks falling in the class
+divided by the proportion of the study area the class occupies. The index
+is the Spearman rank correlation between P/E and class midpoint and ranges
+from −1 to 1; values near 1 indicate lek density rises monotonically with
+predicted suitability, 0 indicates a surface no better than chance, and
+negative values indicate counter-prediction. The surface was also
+externally compared against the U.S. Geological Survey's independent,
+telemetry-based spring habitat selection categories for Nevada and
+northeastern California (ver. 3.0, 2025) [40] at 150,000 seeded random
+locations.
 
 To generate prediction values across the study area, the averaged model was
 applied directly to the covariate rasters: every 30-m cell in the study
@@ -369,8 +379,9 @@ vegetation contrasts relative to shrubland).
 
 {{< include v4/tables/coefficients.md >}}
 
-![Model-averaged coefficients with 85% CIs (forest
-plot).](v4/figs/forest.png){width=70%}
+![Model-averaged coefficients with 85% CIs (forest plot). Red indicates
+negative estimates and blue positive; open symbols mark effects whose 85%
+CI crosses zero.](v4/figs/forest.png){width=70%}
 
 ![Marginal response curves from the top model: predicted probability of lek
 occurrence across each covariate's observed range, others held at
@@ -408,7 +419,9 @@ The averaged model discriminated well between used and available sites
 5-fold cross-validation of the top model 0.80 ± 0.04), and predicted
 probabilities were well calibrated across deciles (Fig. 7). Evaluated
 against the final prediction surface, the continuous Boyce index was 0.92
-(S2 Table). Externally, the surface correlated positively with the USGS
+(S2 Table): lek density rises nearly monotonically across the
+predicted-suitability gradient, and cells in the highest probability class
+hold leks at more than six times the rate their area alone would predict. Externally, the surface correlated positively with the USGS
 telemetry-based spring habitat selection categories (Spearman ρ = 0.53 at
 ~147,000 common locations): 46% of the USGS lowest-selection cells fell in
 our lowest quantile bin and 41% of their highest-selection cells in our
@@ -437,7 +450,9 @@ area.](v4/figs/usgs_side_by_side.png)
 gradient is monotone — 46% of the USGS lowest-selection cells fall in our
 lowest bin, and 41% of their highest-selection cells fall in our highest.
 
-{{< include v4/tables/usgs_contingency.md >}} Predicted probability at used leks was
+{{< include v4/tables/usgs_contingency.md >}}
+
+Predicted probability at used leks was
 uncorrelated with peak male counts (Spearman ρ = 0.04), indicating the
 surface characterizes lek placement rather than lek size [6].
 
@@ -610,6 +625,11 @@ Coates 2021; Manly 2007; Aldridge & Boyce 2007; Aldridge 2008; Carpenter
 - [40] U.S. Geological Survey. Rasters representing greater sage-grouse
   space use, habitat selection, and survival to inform habitat management
   (ver. 3.0, September 2025) [data release]. https://doi.org/10.5066/P933VE6W.
+- [41] Boyce MS, Vernier PR, Nielsen SE, Schmiegelow FKA. Evaluating
+  resource selection functions. Ecol Model 2002;157(2–3):281–300.
+- [42] Hirzel AH, Le Lay G, Helfer V, Randin C, Guisan A. Evaluating the
+  ability of habitat suitability models to predict species presences. Ecol
+  Model 2006;199(2):142–152.
 
 ## Supporting Information
 
@@ -618,7 +638,10 @@ mean of each continuous variable used in the RSF.
 
 {{< include v4/tables/validation.md >}}
 
-**S2 Table.** Continuous Boyce evaluation: predicted-to-expected ratio by
-probability class.
+**S2 Table.** Continuous Boyce evaluation: predicted-to-expected (P/E)
+ratio of lek occurrence by predicted-probability class. P/E > 1 indicates a
+class captures more leks than its areal share of the study region alone
+would predict; a monotone rise in P/E across classes yields an index near 1
+[42].
 
 {{< include v4/tables/boyce.md >}}

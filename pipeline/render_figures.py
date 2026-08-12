@@ -109,18 +109,29 @@ def clean(ix):
     return (ix.str.replace("scale_", "", regex=False)
               .str.replace("Direction", "Aspect: ", regex=False)
               .str.replace("Vegetation", "", regex=False))
+NEG, POS = "#c0392b", "#2e6da4"   # sjPlot convention: red negative, blue positive
 fig, axes = plt.subplots(1, 2, figsize=(11, 4.8))
 for ax, dat, title in [(axes[0], terrain, "Terrain, roads, aspect"),
                        (axes[1], veg, "Vegetation (vs shrubland)")]:
     d = dat.sort_values("Estimate")
     yy = np.arange(len(d))
-    colors = ["#a05252" if v < 0 else "#3a6ea5" for v in d.Estimate]
+    colors = [NEG if v < 0 else POS for v in d.Estimate]
+    sig = (d.ci85_low > 0) | (d.ci85_high < 0)   # CI excludes zero
     ax.hlines(yy, d.ci85_low, d.ci85_high, color=colors, linewidth=1.6)
-    ax.scatter(d.Estimate, yy, color=colors, zorder=3, s=22)
+    face = [c if s else "white" for c, s in zip(colors, sig)]
+    ax.scatter(d.Estimate, yy, facecolor=face, edgecolor=colors,
+               linewidth=1.3, zorder=3, s=30)
     ax.axvline(0, color="#777", linewidth=0.9)
     ax.set_yticks(yy); ax.set_yticklabels(clean(d.index), fontsize=8)
     ax.set_title(title, fontsize=10)
     ax.set_xlabel("standardized coefficient (85% CI)")
+from matplotlib.lines import Line2D
+axes[0].legend(handles=[
+    Line2D([], [], marker="o", color=NEG, linestyle="", label="negative"),
+    Line2D([], [], marker="o", color=POS, linestyle="", label="positive"),
+    Line2D([], [], marker="o", markerfacecolor="white", color="#555",
+           linestyle="", label="85% CI crosses zero")],
+    frameon=False, fontsize=8, loc="lower right")
 fig.suptitle("Model-averaged effects, top three models", fontsize=11)
 fig.tight_layout()
 fig.savefig(FIGS / "forest.png", dpi=150, bbox_inches="tight")

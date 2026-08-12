@@ -41,9 +41,23 @@ mids, F = np.array(mids), np.array(F)
 rank = lambda a: pd.Series(a).rank().values
 boyce = float(np.corrcoef(rank(mids), rank(F))[0, 1])
 
-tbl = pd.DataFrame({"class midpoint": np.round(mids, 4), "P/E ratio": np.round(F, 2)})
+tbl = pd.DataFrame({"Predicted probability (class midpoint)": np.round(mids, 3),
+                    "P/E ratio (lek share / area share)": np.round(F, 2)})
 (ROOT / "reports/v4/tables").mkdir(parents=True, exist_ok=True)
+# single source of truth for the P/E curve figure (map_panels.py plots this)
+pd.DataFrame({"midpoint": mids, "pe": F, "boyce": boyce}).to_csv(
+    ROOT / "reports/v4/boyce_pe.csv", index=False)
 with open(ROOT / "reports/v4/tables/boyce.md", "w") as f:
-    f.write(tbl.to_markdown(index=False) + f"\n\n**Continuous Boyce index: {boyce:.3f}**\n")
+    f.write(tbl.to_markdown(index=False) + f"\n\n**Continuous Boyce index: {boyce:.3f}**\n\n"
+            "P/E is the predicted-to-expected ratio: the proportion of the used "
+            "leks whose predicted probability falls in a class, divided by the "
+            "proportion of the study area in that class. P/E = 1 means leks occur "
+            "in the class at exactly the rate its area alone would predict; P/E > 1 "
+            "means the class captures more leks than its share of the landscape. "
+            "The continuous Boyce index (Hirzel et al. 2006) is the Spearman rank "
+            "correlation between P/E and class midpoint: it ranges from −1 to 1, "
+            "where values near 1 indicate lek density rises monotonically with "
+            "predicted suitability, 0 indicates a surface no better than chance, "
+            "and negative values indicate counter-prediction.\n")
 print(f"P/E by class: {np.round(F, 2).tolist()}")
 print(f"BOYCE_INDEX: {boyce:.3f}")
