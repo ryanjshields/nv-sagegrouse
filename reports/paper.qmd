@@ -35,12 +35,14 @@ incorporated 30-m resolution spatial data with the coordinate locations of
 currently active lek sites to model site selection across the species'
 152,458-km² distribution in Nevada, USA. We generated 12 a priori models
 using different covariates to predict lek occurrence. Leks were more likely
-to occur at higher elevations (model-averaged β = 0.94, 85% CI 0.86 – 1.03)
-and less likely to occur on steeper slopes (β = −1.17, 85% CI −1.31 – −1.03)
-and on rugged terrain measured by the Vector Ruggedness Measure (β = −1.00,
-85% CI −1.26 – −0.74); herbaceous cover types were favored over conifer,
-which was strongly avoided, and leks sat modestly closer to roads than
-availability (β = −0.09, 85% CI −0.17 – −0.01). The averaged model discriminated well (AUC =
+to occur at higher elevations (model-averaged β = 0.96, 85% CI 0.87 – 1.05)
+and less likely to occur on steeper slopes (β = −1.18, 85% CI −1.32 – −1.04)
+and on rugged terrain measured by the Vector Ruggedness Measure (β = −1.01,
+85% CI −1.26 – −0.75); herbaceous cover types were favored over conifer,
+which was strongly avoided. Distinguishing road classes revealed opposing
+associations: leks sat farther from paved roads (β = 0.10, 85% CI
+0.04 – 0.17) and marginally closer to unpaved roads and vehicular trails
+(β = −0.10, 85% CI −0.20 – 0.00). The averaged model discriminated well (AUC =
 0.80; 5-fold cross-validation 0.79 ± 0.01). The analysis is implemented as a
 fully scripted, openly licensed pipeline in which every environmental input
 is fetched from its authoritative public source and every run is exactly
@@ -214,8 +216,13 @@ available-sample mean and its 85% confidence interval (S1 Table).
 We calculated the prediction values for the RSF using logistic regression
 with used (n = 718) and available (n = 7,180) points. Prior to running the
 models, we checked for multicollinearity among explanatory variables and
-found no pairwise correlation more extreme than |0.6| (Fig. 3). We then generated 12
-a priori models (Table 3) using different combinations of the covariates.
+found no pairwise correlation more extreme than |0.6| (Fig. 3). We then generated 15
+a priori models (Table 3): twelve combinations of the terrain, vegetation,
+and all-roads covariates, and three models distinguishing road classes —
+paved (TIGER MTFCC S1100, S1200, S1630) versus unpaved (S1400 local roads
+and S1500 vehicular trails) — to separate a disturbance hypothesis (leks
+avoid high-use roads) from an openness hypothesis (unimproved routes
+co-occur with the open terrain leks favor).
 In R [29], we fit each model with the base `glm` function and ranked models
 by AICc using the MuMIn package [34]. We tested our top three models'
 variance inflation factors (VIF) to further inspect for multicollinearity,
@@ -223,9 +230,14 @@ considering VIF > 10 indicative of collinearity [22, 27]; all variables in
 all top models had VIF < 1.6. To account for the uncertainty inherent in
 model selection, we averaged beta coefficients from our top three models to
 generate lek site predictions (Table 4). Model discrimination was assessed
-with the area under the ROC curve on the fitted model average and under
-5-fold cross-validation of the top model, and calibration was inspected by
-deciles of predicted probability.
+with the area under the ROC curve on the fitted model average, under random
+5-fold cross-validation, and under spatially blocked 5-fold
+cross-validation (k-means coordinate blocks); calibration was inspected by
+deciles of predicted probability; the final surface was evaluated with the
+continuous Boyce index; and the surface was externally compared against the
+U.S. Geological Survey's independent, telemetry-based spring habitat
+selection categories for Nevada and northeastern California (ver. 3.0,
+2025) at 150,000 seeded random locations.
 
 To generate prediction values across the study area, the averaged model was
 applied directly to the covariate rasters: every 30-m cell in the study
@@ -263,9 +275,9 @@ vegetation contrasts relative to shrubland).
 {{< include v4/tables/coefficients.md >}}
 
 Based on the model-averaged results, leks were more likely to occur at
-higher elevations (β = 0.94, 85% CI 0.86 – 1.03) and less likely to occur
-on steeper slopes (β = −1.17, 85% CI −1.31 – −1.03) and on rugged terrain
-(VRM; β = −1.00, 85% CI −1.26 – −0.74): used lek sites averaged VRM 0.00046
+higher elevations (β = 0.96, 85% CI 0.87 – 1.05) and less likely to occur
+on steeper slopes (β = −1.18, 85% CI −1.32 – −1.04) and on rugged terrain
+(VRM; β = −1.01, 85% CI −1.26 – −0.75): used lek sites averaged VRM 0.00046
 against 0.00197 across availability — display grounds occupy terrain
 roughly four times smoother than the landscape offers. Relative to
 shrubland, grassland and exotic herbaceous cover types sat above the
@@ -280,9 +292,11 @@ occurrence. The averaged model discriminated well between used and available sit
 (AUC = 0.80; random 5-fold cross-validation 0.79 ± 0.01; spatially blocked
 5-fold cross-validation 0.80 ± 0.03), and predicted probabilities were well
 calibrated across deciles (Fig. 7). Evaluated against the final prediction
-surface, the continuous Boyce index was 0.84, with the predicted-to-expected
-ratio rising from 0.4 in the lowest predicted-probability class to 7.7 in
-the highest (S2 Table).
+surface, the continuous Boyce index was 0.99 (S2 Table). Externally, the
+surface correlated positively with the USGS telemetry-based spring habitat
+selection categories (Spearman ρ = 0.52 at 147,036 common locations) —
+aligned with independent data while retaining the complementary,
+lek-specific information of this analysis.
 
 ![Figure 7. Calibration: mean predicted probability versus observed use
 rate by decile.](v4/figs/calibration.png){width=45%} Predicted probability at used leks was
@@ -331,15 +345,15 @@ sage-grouse display ecology. Together these results suggest the smoothness
 of the display surface itself, distinct from slope, is a general feature of
 lek placement in prairie and shrub-steppe grouse.
 
-With all road classes — dominated by unimproved and local roads — included
-in the distance surface, we found a modest association between leks and
-road proximity. This is consistent with lekking activity favoring open and
-accessible sites [1, 7], and with the observation that unpaved, remotely
-located roads can host successful lek sites while busier, noisier roads may
-be inhospitable to lekking activity [13]; the class-specific structure of
-this association (openness of two-track country versus tolerance of low-use
-disturbance) is separable with class-specific distance models, which we
-identify as the immediate next analysis for this dataset.
+Distinguishing road classes resolved what a single all-roads distance
+obscured: leks avoid proximity to paved, higher-use roads while sitting
+marginally closer to unpaved routes and vehicular trails. This is
+consistent with lekking activity favoring open, accessible sites [1, 7] and
+with the observation that unpaved, remotely located roads can host
+successful lek sites while busier, noisier roads may be inhospitable to
+lekking activity [13]. The class-split models outranked every
+single-distance formulation, indicating road type — not road presence — is
+the ecologically relevant axis.
 
 We found that leks were less likely to be located on N-, NW-, S-, SW-, and
 W-facing slopes, compared to E-facing slopes. Leks are typically found on

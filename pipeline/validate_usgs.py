@@ -21,7 +21,7 @@ from pyproj import Transformer
 
 ROOT = Path(__file__).resolve().parent.parent
 D = ROOT / "data-local"
-ITEM = "65f37677d34e9853bbf0db38"
+ITEM = "65f389f9d34e9853bbf0e813"
 
 api = f"https://www.sciencebase.gov/catalog/item/{ITEM}?format=json&fields=files"
 with urllib.request.urlopen(api, timeout=120) as r:
@@ -46,7 +46,11 @@ target = pick(tifs)
 if target is None:
     sys.exit("no directly readable .tif candidate; inspect the file list above (may be zipped)")
 print("selected:", target["name"])
-url = "/vsicurl/" + target["url"]
+local = D / "usgs" / target["name"]
+local.parent.mkdir(parents=True, exist_ok=True)
+if not local.exists():
+    urllib.request.urlretrieve(target["url"], local)
+url = str(local)
 
 sa = gpd.read_file(D / "design/study_area_5070.gpkg")
 pts = sa.sample_points(150_000, rng=99).explode(index_parts=False)

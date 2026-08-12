@@ -23,6 +23,10 @@ dir.create(file.path(root, "reports/v4"), recursive = TRUE, showWarnings = FALSE
 rsf$Use                  <- as.factor(rsf$use)
 rsf$scale_Curvature      <- as.numeric(scale(rsf$curvature))
 rsf$scale_RoadsProximity <- as.numeric(scale(rsf$dist_road_m))
+if ("dist_paved_m" %in% names(rsf)) {
+  rsf$scale_PavedProximity   <- as.numeric(scale(rsf$dist_paved_m))
+  rsf$scale_UnpavedProximity <- as.numeric(scale(rsf$dist_unpaved_m))
+}
 rsf$scale_Elevation      <- as.numeric(scale(rsf$elevation))
 rsf$scale_Ruggedness     <- as.numeric(scale(rsf$tri))
 rsf$scale_Slope          <- as.numeric(scale(rsf$slope))
@@ -45,12 +49,18 @@ m9  <- glm(Use ~ scale_RoadsProximity + scale_Curvature + scale_Slope + Vegetati
 m10 <- glm(Use ~ scale_Slope + scale_Elevation + Vegetation, data = rsf, family = "binomial")
 m11 <- glm(Use ~ scale_Ruggedness + scale_Slope + Vegetation, data = rsf, family = "binomial")
 m12 <- glm(Use ~ scale_RoadsProximity + Direction + scale_Elevation + Vegetation, data = rsf, family = "binomial")
+# Road-class a priori models (2026): decompose the all-roads association.
+m13 <- glm(Use ~ scale_PavedProximity + scale_UnpavedProximity + scale_Curvature + scale_Ruggedness + scale_Slope + Direction + scale_Elevation + Vegetation, data = rsf, family = "binomial")
+m14 <- glm(Use ~ scale_PavedProximity + scale_Curvature + scale_Ruggedness + scale_Slope + Direction + scale_Elevation + Vegetation, data = rsf, family = "binomial")
+m15 <- glm(Use ~ scale_UnpavedProximity + scale_Curvature + scale_Ruggedness + scale_Slope + Direction + scale_Elevation + Vegetation, data = rsf, family = "binomial")
 
-sel <- model.sel(m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12)
+sel <- model.sel(m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15)
 write.csv(as.data.frame(sel), file.path(root, "reports/v4/model_selection.csv"))
 
 top3_names <- rownames(as.data.frame(sel))[1:3]
 top3 <- mget(top3_names)
+cat("road-class betas (m13):\n")
+print(round(summary(m13)$coefficients[c("scale_PavedProximity","scale_UnpavedProximity"), 1:2], 4))
 avg <- model.avg(top3)
 s <- summary(avg)
 betas <- as.data.frame(s$coefmat.full)

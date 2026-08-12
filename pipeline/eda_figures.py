@@ -176,7 +176,10 @@ TERMS = {"m1": "roads + curvature + ruggedness + slope + direction + elevation +
          "m9": "roads + curvature + slope + vegetation",
          "m10": "slope + elevation + vegetation",
          "m11": "ruggedness + slope + vegetation",
-         "m12": "roads + direction + elevation + vegetation"}
+         "m12": "roads + direction + elevation + vegetation",
+         "m13": "paved + unpaved + curvature + ruggedness + slope + direction + elevation + vegetation",
+         "m14": "paved + curvature + ruggedness + slope + direction + elevation + vegetation",
+         "m15": "unpaved + curvature + ruggedness + slope + direction + elevation + vegetation"}
 sel_all = pd.read_csv(ROOT / "reports/v4/model_selection.csv", index_col=0)
 keep2 = [c for c in ("df", "logLik", "AICc", "delta", "weight") if c in sel_all.columns]
 t3 = sel_all[keep2].reset_index().rename(columns={"index": "Model"})

@@ -1,28 +1,29 @@
 | Term                                                          |   Estimate |   85% CI low |   85% CI high |
 |:--------------------------------------------------------------|-----------:|-------------:|--------------:|
-| (Intercept)                                                   |   -2.565   |    -2.739    |      -2.391   |
-| scale_RoadsProximity                                          |    0.0533  |    -0.005614 |       0.1122  |
-| scale_Curvature                                               |   -0.4266  |    -0.5559   |      -0.2973  |
-| scale_Ruggedness                                              |   -1.016   |    -1.274    |      -0.7584  |
-| scale_Slope                                                   |   -1.194   |    -1.336    |      -1.051   |
-| DirectionN                                                    |   -0.1426  |    -0.3726   |       0.08742 |
-| DirectionNE                                                   |   -0.2777  |    -0.5116   |      -0.0439  |
-| DirectionNW                                                   |   -0.5604  |    -0.786    |      -0.3349  |
-| DirectionS                                                    |   -0.07249 |    -0.3014   |       0.1564  |
-| DirectionSE                                                   |    0.06935 |    -0.1252   |       0.2639  |
-| DirectionSW                                                   |   -0.5066  |    -0.7721   |      -0.2411  |
-| DirectionW                                                    |   -0.5604  |    -0.7898   |      -0.3309  |
-| scale_Elevation                                               |    0.9602  |     0.8718   |       1.049   |
-| VegetationAgricultural                                        |   -1.486   |    -2.527    |      -0.4446  |
-| VegetationConifer                                             |   -3.936   |    -4.964    |      -2.908   |
-| VegetationConifer-Hardwood                                    |  -13.02    |  -690.9      |     664.8     |
-| VegetationDeveloped-Roads                                     |   -0.758   |    -2.259    |       0.7432  |
-| VegetationExotic Herbaceous                                   |    0.3096  |     0.06073  |       0.5584  |
-| VegetationExotic Tree-Shrub                                   |   -0.3303  |    -0.744    |       0.08347 |
-| VegetationGrassland                                           |    0.4142  |     0.1246   |       0.7038  |
-| VegetationHardwood                                            |  -14.01    |  -695.5      |     667.5     |
-| VegetationOpen Water                                          |  -14.41    | -1013        |     984.5     |
-| VegetationOther                                               |  -14.01    |  -856.4      |     828.4     |
-| VegetationQuarries-Strip Mines-Gravel Pits-Well and Wind Pads |    0.6215  |    -1.038    |       2.281   |
-| VegetationRiparian                                            |   -1.128   |    -1.633    |      -0.6225  |
-| VegetationSparsely Vegetated                                  |   -2.622   |    -4.075    |      -1.169   |
+| (Intercept)                                                   |   -2.571   |     -2.745   |     -2.397    |
+| scale_PavedProximity                                          |    0.1022  |      0.03466 |      0.1698   |
+| scale_UnpavedProximity                                        |   -0.09716 |     -0.1987  |      0.004364 |
+| scale_Curvature                                               |   -0.4193  |     -0.5484  |     -0.2901   |
+| scale_Ruggedness                                              |   -1.005   |     -1.263   |     -0.7463   |
+| scale_Slope                                                   |   -1.18    |     -1.324   |     -1.036    |
+| DirectionN                                                    |   -0.1389  |     -0.369   |      0.09118  |
+| DirectionNE                                                   |   -0.285   |     -0.5188  |     -0.0512   |
+| DirectionNW                                                   |   -0.5536  |     -0.7792  |     -0.328    |
+| DirectionS                                                    |   -0.05419 |     -0.2832  |      0.1749   |
+| DirectionSE                                                   |    0.07477 |     -0.1199  |      0.2695   |
+| DirectionSW                                                   |   -0.5007  |     -0.7662  |     -0.2351   |
+| DirectionW                                                    |   -0.5512  |     -0.7805  |     -0.3219   |
+| scale_Elevation                                               |    0.9581  |      0.8693  |      1.047    |
+| VegetationAgricultural                                        |   -1.491   |     -2.532   |     -0.4505   |
+| VegetationConifer                                             |   -3.485   |     -4.328   |     -2.642    |
+| VegetationConifer-Hardwood                                    |  -13.06    |   -697.5     |    671.4      |
+| VegetationDeveloped-Roads                                     |   -1.029   |     -2.519   |      0.4618   |
+| VegetationExotic Herbaceous                                   |    0.2121  |     -0.04626 |      0.4705   |
+| VegetationExotic Tree-Shrub                                   |   -0.5815  |     -1.062   |     -0.1006   |
+| VegetationGrassland                                           |    0.4468  |      0.1674  |      0.7261   |
+| VegetationHardwood                                            |  -14.31    |   -749.6     |    721        |
+| VegetationOpen Water                                          |  -14.32    |   -958.5     |    929.9      |
+| VegetationOther                                               |  -13.75    |   -786.7     |    759.2      |
+| VegetationQuarries-Strip Mines-Gravel Pits-Well and Wind Pads |    0.6132  |     -1.041   |      2.267    |
+| VegetationRiparian                                            |   -1.051   |     -1.532   |     -0.5696   |
+| VegetationSparsely Vegetated                                  |   -1.859   |     -2.898   |     -0.8198   |

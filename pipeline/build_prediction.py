@@ -60,6 +60,12 @@ for v, p in phys.items():
     VEG_LUT[int(v)] = veg_beta(str(p))
 
 paths = {k: D / "dem" / f"nv_{k}_5070.tif" for k in ("dem", "slope", "aspect", "vrm", "curv", "distroad")}
+HAS_CLASS = "scale_PavedProximity" in betas.index
+if HAS_CLASS:
+    paths["distpaved"] = D / "dem/nv_distroad_paved_5070.tif"
+    paths["distunpaved"] = D / "dem/nv_distroad_unpaved_5070.tif"
+    SC["dist_paved_m"] = (mi["dist_paved_m"].mean(), mi["dist_paved_m"].std())
+    SC["dist_unpaved_m"] = (mi["dist_unpaved_m"].mean(), mi["dist_unpaved_m"].std())
 paths["evt"] = Path(EVT_PATH)
 srcs = {k: rasterio.open(p) for k, p in paths.items()}
 eq1_src = rasterio.open(D / "dem/nv_rugg_5070.tif")
@@ -102,6 +108,9 @@ for row0 in range(0, H, BLOCK):
            + b("scale_Elevation") * z(dem, "elevation")
            + b("scale_Curvature") * z(curv, "curvature")
            + b("scale_RoadsProximity") * z(dist, "dist_road_m"))
+    if HAS_CLASS:
+        eta += (b("scale_PavedProximity") * z(rd("distpaved"), "dist_paved_m")
+                + b("scale_UnpavedProximity") * z(rd("distunpaved"), "dist_unpaved_m"))
     dir_arr = np.zeros_like(aspect)
     for lab, (lo, hi) in {"N": (337.5, 22.5), "NE": (22.5, 67.5), "SE": (112.5, 157.5),
                           "S": (157.5, 202.5), "SW": (202.5, 247.5), "W": (247.5, 292.5),
