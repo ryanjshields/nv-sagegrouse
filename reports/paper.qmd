@@ -198,13 +198,27 @@ construction (r = 0.40 in our design), making it well suited to models that
 include both terms; it is the standard ruggedness metric in wildlife
 habitat analysis [33].
 
-![Figure 2. Terrain covariates on the 30-m analysis grid, clipped to
-Nevada: elevation, slope, and the Vector Ruggedness
-Measure.](v4/figs/terrain.png)
+![Figure 2. Predictor surfaces on the 30-m analysis grid, clipped to
+Nevada: elevation, slope, VRM, curvature, class-specific road distances,
+aspect, and major vegetation classes.](v4/figs/covariate_multiples.png)
 
 The roads dataset comprised all Census TIGER/Line road classes (MTFCC
-schema), including local roads and unimproved vehicular trails, which
-dominate road length within the study area. As in previous analyses of this
+schema) — 100,790 km of road within the study area — dominated by local
+roads and unimproved vehicular trails (Table 1, Table 2; Figs. 2a–2b in
+supporting charts below).
+
+![Road length in the study area by MTFCC class.](v4/figs/roads_by_class.png){width=70%}
+
+![Road length in the study area by usage group.](v4/figs/roads_by_usage.png){width=65%}
+
+**Table 1.** MTFCC classes present in the study area.
+
+{{< include v4/tables/mtfcc_codes.md >}}
+
+**Table 2.** MTFCC classes aggregated to usage groups.
+
+{{< include v4/tables/mtfcc_usage.md >}}
+ As in previous analyses of this
 system, we treated all roads as equal and modeled the Euclidean distance to
 the nearest road on the DEM grid to ensure cell-location continuity with
 the elevation-derived rasters. Finally, elevation, aspect, slope,
@@ -278,6 +292,13 @@ vegetation contrasts relative to shrubland).
 
 {{< include v4/tables/coefficients.md >}}
 
+![Model-averaged coefficients with 85% CIs (forest
+plot).](v4/figs/forest.png){width=70%}
+
+![Marginal response curves from the top model: predicted probability of lek
+occurrence across each covariate's observed range, others held at
+reference values.](v4/figs/response_curves.png)
+
 Based on the model-averaged results, leks were more likely to occur at
 higher elevations (β = 0.96, 85% CI 0.87 – 1.05) and less likely to occur
 on steeper slopes (β = −1.18, 85% CI −1.32 – −1.04) and on rugged terrain
@@ -303,7 +324,15 @@ aligned with independent data while retaining the complementary,
 lek-specific information of this analysis.
 
 ![Figure 7. Calibration: mean predicted probability versus observed use
-rate by decile.](v4/figs/calibration.png){width=45%} Predicted probability at used leks was
+rate by decile.](v4/figs/calibration.png){width=45%}
+
+![ROC curve, top model.](v4/figs/roc.png){width=40%}
+
+![Boyce evaluation: predicted-to-expected ratio by probability
+class.](v4/figs/boyce_curve.png){width=48%}
+
+![External comparison against the USGS telemetry-based spring
+habitat-selection categories.](v4/figs/usgs_side_by_side.png) Predicted probability at used leks was
 uncorrelated with peak male counts (Spearman ρ = 0.07), indicating the
 surface characterizes lek placement rather than lek size [6].
 
@@ -313,6 +342,10 @@ probability using a quantile
 classification.](v4/figs/prediction_map_v4.png){width=62%}
 
 {{< include v4/tables/prediction_bins_v4.md >}}
+
+![Fine-scale structure of the prediction surface: the statewide map with a
+60-km window (Tuscarora Mountains area, selected for terrain diversity)
+resolved at full 30-m detail.](v4/figs/prediction_zoom.png)
 
 ## Discussion
 
