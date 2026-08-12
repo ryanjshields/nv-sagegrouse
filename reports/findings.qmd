@@ -126,6 +126,11 @@ availability.
 ![Vegetation physiognomy at used versus available
 sites.](v4/figs/veg_proportions.png)
 
+![Pearson correlations among continuous predictors. Slope and elevation carry
+the strongest association (r ≈ 0.4 with VRM and each other); nothing
+approaches the collinearity threshold, consistent with all VIF ≤ 1.5.
+](v4/figs/correlation.png){width=60%}
+
 **Summary statistics.**
 
 {{< include v4/tables/summary_stats.md >}}
@@ -164,6 +169,21 @@ lek sites show **strong avoidance of rugged terrain** (β = −1.02, 85% CI
 −1.27 – −0.76): used sites average VRM 0.00046 against 0.00197 across
 availability — display grounds sit on terrain roughly four times smoother
 than the landscape offers.
+
+**Model diagnostics.** Discrimination and out-of-sample stability were
+assessed with the area under the ROC curve: **AUC = 0.801** for the full
+model average, and **0.791 ± 0.012** under 5-fold cross-validation of the top
+model — good discrimination that holds out of sample. Calibration by decile
+of predicted probability tracks the identity line:
+
+![Calibration: mean predicted probability versus observed use rate, by
+decile.](v4/figs/calibration.png){width=48%}
+
+Spatially blocked cross-validation and a Boyce index computed against the
+full prediction surface are planned once the statewide prediction raster is
+generated; reviewer history on this team's prior RSF work (Baum et al. 2022,
+*Rangeland Ecology & Management* 84:117–125) indicates spatial structure will
+be a review focus, and lek clustering will be addressed directly.
 
 ![Vegetation selection relative to the shrubland
 reference.](v4/figs/vegetation.png)

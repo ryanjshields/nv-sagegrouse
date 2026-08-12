@@ -68,3 +68,25 @@ cat("top 3 models:", paste(top3_names, collapse = ", "), "\n")
 key <- c("scale_Ruggedness", "scale_Elevation", "scale_Slope")
 print(round(betas[rownames(betas) %in% key, c("Estimate", "ci85_low", "ci85_high")], 3))
 cat("MODEL_FIT_COMPLETE\n")
+
+# -- Diagnostics: AUC, 5-fold CV, calibration (base R, no extra packages) ------
+auc <- function(y, p) { r <- rank(p); n1 <- sum(y == 1); n0 <- sum(y == 0)
+  (sum(r[y == 1]) - n1 * (n1 + 1) / 2) / (n1 * n0) }
+p_full <- predict(avg, type = "response")
+set.seed(20260811)
+folds <- sample(rep(1:5, length.out = nrow(rsf)))
+cv_auc <- sapply(1:5, function(k) {
+  fit <- glm(formula(get(top3_names[1])), data = rsf[folds != k, ], family = "binomial")
+  auc(as.numeric(as.character(rsf$Use[folds == k])), predict(fit, rsf[folds == k, ], type = "response"))
+})
+y <- as.numeric(as.character(rsf$Use))
+dec <- cut(p_full, quantile(p_full, seq(0, 1, 0.1)), include.lowest = TRUE, labels = FALSE)
+calib <- data.frame(decile = 1:10,
+                    mean_predicted = tapply(p_full, dec, mean),
+                    observed_rate  = tapply(y, dec, mean))
+write.csv(calib, file.path(root, "reports/v4/calibration.csv"), row.names = FALSE)
+diag_df <- data.frame(metric = c("AUC (full model average)", "AUC (5-fold CV, top model)", "CV sd"),
+                      value = c(auc(y, p_full), mean(cv_auc), sd(cv_auc)))
+write.csv(diag_df, file.path(root, "reports/v4/diagnostics.csv"), row.names = FALSE)
+cat("AUC full:", round(auc(y, p_full), 3), "| CV AUC:", round(mean(cv_auc), 3), "+/-", round(sd(cv_auc), 3), "\n")
+cat("DIAGNOSTICS_COMPLETE\n")

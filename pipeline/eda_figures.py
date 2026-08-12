@@ -117,3 +117,33 @@ with open(TABLES / "coefficients.md", "w") as f:
 
 print("EDA_COMPLETE:", sorted(p.name for p in FIGS.glob("*.png")), "|",
       sorted(p.name for p in TABLES.glob("*.md")))
+
+# --- Fig: covariate correlation matrix (the biometry-lab check) -----------------
+cols = [c for c, _ in CONT]
+labels = [l for _, l in CONT]
+cm = pts[cols].corr()
+fig, ax = plt.subplots(figsize=(5.6, 4.8))
+im = ax.imshow(cm, cmap="RdBu_r", vmin=-1, vmax=1)
+ax.set_xticks(range(len(labels))); ax.set_xticklabels(labels, rotation=35, ha="right", fontsize=8)
+ax.set_yticks(range(len(labels))); ax.set_yticklabels(labels, fontsize=8)
+for i in range(len(labels)):
+    for j in range(len(labels)):
+        ax.text(j, i, f"{cm.iloc[i, j]:.2f}", ha="center", va="center",
+                fontsize=8, color="white" if abs(cm.iloc[i, j]) > 0.6 else "black")
+fig.colorbar(im, shrink=0.8)
+ax.set_title("Pearson correlations among continuous predictors", fontsize=10)
+fig.savefig(FIGS / "correlation.png", dpi=150, bbox_inches="tight")
+plt.close(fig)
+
+# --- Fig: calibration (deciles of predicted vs observed) ------------------------
+cal = pd.read_csv(ROOT / "reports/v4/calibration.csv")
+fig, ax = plt.subplots(figsize=(4.8, 4.4))
+ax.plot([0, cal[["mean_predicted", "observed_rate"]].values.max() * 1.1] * 1, linestyle="--", color="#999")
+lim = max(cal.mean_predicted.max(), cal.observed_rate.max()) * 1.15
+ax.plot([0, lim], [0, lim], "--", color="#999", linewidth=0.8)
+ax.scatter(cal.mean_predicted, cal.observed_rate, color="#3a6ea5", zorder=3)
+ax.set_xlabel("mean predicted probability (decile)"); ax.set_ylabel("observed use rate")
+ax.set_title("Calibration: predicted vs observed by decile", fontsize=10)
+fig.savefig(FIGS / "calibration.png", dpi=150, bbox_inches="tight")
+plt.close(fig)
+print("EDA_EXTRA_COMPLETE")
