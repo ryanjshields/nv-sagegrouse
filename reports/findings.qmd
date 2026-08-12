@@ -59,14 +59,15 @@ redistributed; researchers may request them from NDOW.
 | Lek locations | NDOW historical lek count dataset | counts 1947–2018 | acquired 2020, under agreement |
 | Elevation | USGS 3DEP, 1 arc-second (30 m), 72 tiles | tile vintages 2013–2026 | TNM API, 2026-08-11, manifested |
 | Vegetation | LANDFIRE LF2025 Existing Vegetation Type (EVT_PHYS) | LF2025 | LFPS API, 2026-08-11 |
-| Roads | U.S. Census TIGER/Line, Nevada primary & secondary roads | 2024 | 2026-08-11 |
+| Roads | U.S. Census TIGER/Line, all road classes, 17 NV counties (202,967 segments) | 2024 | 2026-08-11 |
 | Range polygon | USFWS 2015 Status Review current range | 2015 | ScienceBase API, 2026-08-11 |
 
 All acquisition is performed by pipeline scripts that write provenance
-manifests (exact URLs, publication dates, sizes) alongside the data. Note one
-departure from earlier drafts: the roads layer is TIGER primary and secondary
-roads; the 2024 draft's roads data additionally included minor and unimproved
-roads. Road proximity did not enter the top model set in either analysis.
+manifests (exact URLs, publication dates, sizes) alongside the data. The
+roads layer includes every MTFCC class down to unimproved vehicular trails;
+three Euclidean-distance surfaces are built from it (any road, paved,
+unpaved), and the paved/unpaved split models rank above all single-distance
+formulations.
 
 ## Statistical Analysis
 
@@ -85,11 +86,13 @@ Environmental data included LANDFIRE Existing Vegetation Type physiognomy
 layer's categories — conifer, conifer-hardwood, exotic herbaceous, exotic
 tree-shrub, grassland, quarries–strip mines–gravel pits–well/wind pads,
 riparian, shrubland, sparsely vegetated, and other — follow the draft
-analysis, with classes rarer than 10 sites collapsed into "other." DEM
-derivatives included aspect, slope, curvature, and ruggedness. We categorized
-aspect into eight cardinal directions (N, NE, E, SE, S, SW, W, NW).
-Anthropogenic activity is represented by the Euclidean distance from each
-site to the nearest road.
+analysis, with classes rarer than 10 sites, or holding fewer than 5 used
+leks (a separation guard), collapsed into "other." DEM derivatives included
+aspect, slope, curvature, and ruggedness. We categorized aspect into eight
+cardinal directions (N, NE, E, SE, S, SW, W, NW) plus Flat for cells with
+slope below 0.5° (where aspect is undefined). Anthropogenic activity is
+represented by three Euclidean road-distance surfaces: any road, paved
+(S1100/S1200/S1630), and unpaved (S1400/S1500).
 
 Ruggedness is the **Vector Ruggedness Measure** (VRM; Sappington et al.
 2007), computed over a 3×3 (90 m × 90 m) window from the slope and aspect
@@ -107,11 +110,11 @@ Cloud-Optimized GeoTIFFs.](v4/figs/covariate_multiples.png)
 
 ### Models
 
-Continuous covariates were standardized (z-scaled). We fit the twelve a
-priori binomial GLMs of the draft analysis — additive combinations of road
-proximity, curvature, ruggedness, slope, aspect direction, elevation, and
-vegetation — ranked them by AICc, checked multicollinearity with variance
-inflation factors (all ≤ 1.5), and averaged the top three models to generate
+Continuous covariates were standardized (z-scaled). We fit fifteen
+candidate binomial GLMs — the draft's twelve a priori combinations plus a
+second-stage decomposition distinguishing paved from unpaved road distance —
+ranked them by AICc, checked multicollinearity with variance inflation
+factors (all ≤ 1.8), and averaged the top three models to generate
 coefficient estimates with 85% confidence intervals.
 
 ## Exploratory Data Analysis
@@ -129,9 +132,10 @@ suppressed for scale).](v4/figs/boxplots.png)
 ![Vegetation physiognomy at used versus available
 sites.](v4/figs/veg_proportions.png)
 
-![Pearson correlations among continuous predictors. Slope and elevation carry
-the strongest association (r ≈ 0.4 with VRM and each other); nothing
-approaches the collinearity threshold, consistent with all VIF ≤ 1.5.
+![Pearson correlations among continuous predictors. Distance-to-any-road
+and distance-to-unpaved are near-collinear (r = 0.99) because unpaved routes
+dominate the network — those two never co-occur in a model; within-model
+pairs stay below |0.6|, consistent with VIF ≤ 1.8.
 ](v4/figs/correlation.png){width=60%}
 
 **Summary statistics.**
@@ -151,9 +155,9 @@ curvature are covered.
 
 ## Results
 
-**Model selection** (all twelve a priori models, matching the draft's Table
-3). The same three models lead the AICc ranking as in the draft analysis
-(m1, m7, m2), in slightly different order:
+**Model selection** (fifteen candidate models). The three road-class
+models (m13–m15) lead the ranking, ahead of all twelve original
+formulations:
 
 {{< include v4/tables/model_selection.md >}}
 
@@ -175,7 +179,7 @@ availability — display grounds sit on terrain roughly four times smoother
 than the landscape offers.
 
 **Model diagnostics.** Discrimination and out-of-sample stability were
-assessed with the area under the ROC curve: **AUC = 0.801** for the full
+assessed with the area under the ROC curve: **AUC = 0.81** for the full
 model average, and **0.791 ± 0.012** under 5-fold cross-validation of the top
 model — good discrimination that holds out of sample. Calibration by decile
 of predicted probability tracks the identity line:
