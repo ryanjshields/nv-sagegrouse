@@ -33,22 +33,35 @@ ax.set_title("Study area: sage-grouse range in Nevada\n(USFWS 2015 range; 152,45
 fig.savefig(FIGS / "study_area.png", dpi=150, bbox_inches="tight")
 plt.close(fig)
 
-# --- Fig 2: terrain covariate thumbnails (COG overview reads) ------------------
-panels = [("nv_dem_5070.tif", "Elevation (m)", "terrain", None),
-          ("nv_slope_5070.tif", "Slope (°)", "magma", (0, 40)),
-          ("nv_vrm_5070.tif", "VRM (×1000)", "viridis", (0, 20))]
-fig, axes = plt.subplots(1, 3, figsize=(10.5, 4.2))
-for ax, (fname, title, cmap, clim) in zip(axes, panels):
-    with rasterio.open(D / fname) as src:
-        a = src.read(1, out_shape=(1, 700, int(700 * src.width / src.height))).astype("float64")
-    if "vrm" in fname:
+# --- Fig 2: terrain covariate thumbnails (COG overview reads, masked to NV) ---
+from affine import Affine
+from rasterio.features import rasterize
+
+nv_geom = nv.union_all()
+panels = [("nv_dem_5070.tif", "Elevation (m)", "gist_earth", False),
+          ("nv_slope_5070.tif", "Slope (\u00b0)", "inferno", False),
+          ("nv_vrm_5070.tif", "VRM (\u00d71000)", "viridis", True)]
+fig, axes = plt.subplots(1, 3, figsize=(11, 4.6))
+for ax, (fname, title, cmap, is_vrm) in zip(axes, panels):
+    with rasterio.open(D / fname) as src_r:
+        oh = 800
+        ow = int(oh * src_r.width / src_r.height)
+        a = src_r.read(1, out_shape=(oh, ow), masked=True).astype("float64").filled(np.nan)
+        t = src_r.transform * Affine.scale(src_r.width / ow, src_r.height / oh)
+        b = src_r.bounds
+    a[np.abs(a) > 1e5] = np.nan
+    if is_vrm:
         a = a * 1000.0
-    a[a < -1e30] = np.nan
-    im = ax.imshow(a, cmap=cmap, vmin=None if clim is None else clim[0],
-                   vmax=None if clim is None else clim[1])
-    ax.set_axis_off(); ax.set_title(title, fontsize=9)
-    fig.colorbar(im, ax=ax, shrink=0.6)
-fig.suptitle("Terrain covariates, 30 m EPSG:5070 (COG overview reads)", fontsize=10)
+    state_mask = rasterize([(nv_geom, 1)], out_shape=(oh, ow), transform=t, fill=0).astype(bool)
+    a[~state_mask] = np.nan
+    vmin, vmax = np.nanpercentile(a, [2, 98])
+    im = ax.imshow(a, cmap=cmap, vmin=vmin, vmax=vmax,
+                   extent=(b.left, b.right, b.bottom, b.top))
+    nv.boundary.plot(ax=ax, color="#444", linewidth=0.6)
+    ax.set_axis_off(); ax.set_title(title, fontsize=10)
+    fig.colorbar(im, ax=ax, orientation="horizontal", shrink=0.75, pad=0.03)
+fig.suptitle("Terrain covariates, 30 m EPSG:5070, clipped to Nevada", fontsize=11)
+fig.tight_layout()
 fig.savefig(FIGS / "terrain.png", dpi=150, bbox_inches="tight")
 plt.close(fig)
 
