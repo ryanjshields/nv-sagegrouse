@@ -147,3 +147,40 @@ ax.set_title("Calibration: predicted vs observed by decile", fontsize=10)
 fig.savefig(FIGS / "calibration.png", dpi=150, bbox_inches="tight")
 plt.close(fig)
 print("EDA_EXTRA_COMPLETE")
+
+# --- Fig: box-and-whisker comparison, used vs available -------------------------
+fig, axes = plt.subplots(1, 5, figsize=(11.5, 3.6))
+for ax, (col, label) in zip(axes, CONT):
+    data = [pts.loc[pts.use == 0, col].dropna(), pts.loc[pts.use == 1, col].dropna()]
+    if col in ("tri", "dist_road_m"):
+        data = [d[d < d.quantile(0.99)] for d in data]
+    bp = ax.boxplot(data, tick_labels=["avail", "used"], widths=0.55, patch_artist=True,
+                    showfliers=False, medianprops=dict(color="black"))
+    for patch, c in zip(bp["boxes"], ["#9aa5b1", "#3a6ea5"]):
+        patch.set_facecolor(c); patch.set_alpha(0.8)
+    ax.set_title(label, fontsize=9); ax.tick_params(labelsize=8)
+fig.suptitle("Used vs available: box-and-whisker comparison (whiskers 1.5 IQR, outliers hidden)", fontsize=10)
+fig.tight_layout()
+fig.savefig(FIGS / "boxplots.png", dpi=150, bbox_inches="tight")
+plt.close(fig)
+
+# --- Table 3 complete: all 12 models with terms ---------------------------------
+TERMS = {"m1": "roads + curvature + ruggedness + slope + direction + elevation + vegetation",
+         "m2": "roads + ruggedness + slope + direction + elevation + vegetation",
+         "m3": "roads + ruggedness + slope + vegetation",
+         "m4": "roads + ruggedness + direction + elevation + vegetation",
+         "m5": "curvature + slope + elevation + vegetation",
+         "m6": "roads + slope + vegetation",
+         "m7": "ruggedness + slope + direction + elevation + vegetation",
+         "m8": "roads + slope + direction + elevation + vegetation",
+         "m9": "roads + curvature + slope + vegetation",
+         "m10": "slope + elevation + vegetation",
+         "m11": "ruggedness + slope + vegetation",
+         "m12": "roads + direction + elevation + vegetation"}
+sel_all = pd.read_csv(ROOT / "reports/v4/model_selection.csv", index_col=0)
+keep2 = [c for c in ("df", "logLik", "AICc", "delta", "weight") if c in sel_all.columns]
+t3 = sel_all[keep2].reset_index().rename(columns={"index": "Model"})
+t3.insert(1, "Terms", t3.Model.map(TERMS))
+with open(TABLES / "model_selection.md", "w") as f:
+    f.write(t3.map(fmt).to_markdown(index=False) + "\n")
+print("BOXPLOTS_AND_TABLE3_COMPLETE")

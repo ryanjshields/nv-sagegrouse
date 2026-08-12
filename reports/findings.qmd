@@ -121,7 +121,10 @@ sites.](v4/figs/distributions.png)
 
 The separation visible above previews every model result: used sites
 concentrate at low slope, low VRM, and higher elevation relative to
-availability.
+availability. The same comparison as box-and-whisker:
+
+![Used versus available sites, box-and-whisker (whiskers 1.5×IQR; outliers
+suppressed for scale).](v4/figs/boxplots.png)
 
 ![Vegetation physiognomy at used versus available
 sites.](v4/figs/veg_proportions.png)
@@ -148,8 +151,9 @@ curvature are covered.
 
 ## Results
 
-**Model selection.** The same three models lead the AICc ranking as in the
-draft analysis (m1, m7, m2), in slightly different order:
+**Model selection** (all twelve a priori models, matching the draft's Table
+3). The same three models lead the AICc ranking as in the draft analysis
+(m1, m7, m2), in slightly different order:
 
 {{< include v4/tables/model_selection.md >}}
 
