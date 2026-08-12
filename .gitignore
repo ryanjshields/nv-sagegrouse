@@ -3,3 +3,4 @@ data-local/
 !versions/*.csv
 .DS_Store
 .vscode/
+reports/*.html
