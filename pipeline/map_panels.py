@@ -141,9 +141,6 @@ labels5 = ["very low", "low", "moderate", "high", "very high"]
 fig, axes = plt.subplots(1, 5, figsize=(16, 4.6))
 share = [np.nansum(bin_state_sa == i) / np.nansum(np.isfinite(bin_state_sa)) for i in range(5)]
 for i, (ax, lab) in enumerate(zip(axes, labels5)):
-    base = np.where(np.isfinite(bin_state_sa), 0.0, np.nan)
-    ax.imshow(base, cmap=ListedColormap(["#e8e6e1"]), vmin=0, vmax=1,
-              extent=(bnd.left, bnd.right, bnd.bottom, bnd.top))
     solo = np.where(bin_state_sa == i, 1.0, np.nan)
     ax.imshow(solo, cmap=ListedColormap(["#1a1a1a"]), vmin=0, vmax=1,
               extent=(bnd.left, bnd.right, bnd.bottom, bnd.top))
