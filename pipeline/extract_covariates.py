@@ -59,11 +59,9 @@ if evt_tifs:
 else:
     print("WARNING: no LANDFIRE tif found -- evt_phys skipped this pass")
 
-# Distance to nearest road (m), EPSG:5070
-roads = gpd.read_parquet(D / "vectors/nv_prisecroads_5070.parquet").to_crs("EPSG:5070")
-gpts = gpd.GeoDataFrame(pts, geometry=gpd.points_from_xy(pts.x, pts.y), crs="EPSG:5070")
-joined = gpd.sjoin_nearest(gpts, roads[["geometry"]], distance_col="dist_road_m")
-pts["dist_road_m"] = joined.groupby(joined.index)["dist_road_m"].min()
+# Distance to nearest road (m): sampled from the all-roads Euclidean-distance
+# surface (build_roads_raster.sh) so points and prediction grid share one source.
+pts["dist_road_m"] = sample(D / "dem/nv_distroad_5070.tif")
 
 out = pts.drop(columns=[c for c in ("evt_val",) if c in pts])
 out.to_parquet(D / "design/model_input.parquet", index=False)
