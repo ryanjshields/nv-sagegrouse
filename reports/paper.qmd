@@ -138,13 +138,22 @@ This study analyzed leks that were categorized as "active" as of 2018 and
 located within Nevada (n = 718), omitting all others.
 
 Environmental and anthropogenic data were acquired programmatically from
-their authoritative public sources: elevation from the USGS 3D Elevation
-Program (3DEP) 1 arc-second (30-m) product; vegetation from the LANDFIRE
-LF2025 Existing Vegetation Type layer [28]; roads from the U.S. Census
-Bureau's TIGER/Line dataset (all road classes, 2024 vintage); and the
-species distribution range from the USFWS 2015 Status Review current range
-[32]. Every acquisition writes a provenance manifest (source URL,
-publication date, checksum) alongside the data.
+their authoritative public sources, and every acquisition writes a
+provenance manifest (source URL, publication date, size) alongside the
+data:
+
+| Input | Service | Product | Volume |
+|---|---|---|---|
+| Elevation | USGS The National Map API (`tnmaccess.nationalmap.gov`) | 3DEP 1 arc-second, cloud-optimized GeoTIFF tiles | 72 one-degree tiles, 3.6 GB, tile vintages 2013–2026, deduplicated to the most recent publication per cell |
+| Vegetation | LANDFIRE Product Service API (`lfps.usgs.gov`) | LF2025 Existing Vegetation Type, EVT_PHYS attribute | statewide clip, 30 m |
+| Roads | U.S. Census TIGER/Line (2024) | all-classes county road files (MTFCC schema) | 17 counties, 202,967 road segments |
+| Range | USGS ScienceBase item API | USFWS 2015 Status Review current range [32] | 556 polygons, clipped to Nevada |
+
+The DEM tiles were mosaicked and warped to a common 30-m analysis grid
+(EPSG:5070, Albers equal-area), from which all terrain derivatives were
+computed; the vegetation and distance-to-road surfaces were aligned to the
+same grid. Intermediate layers are staged as cloud-optimized GeoTIFF and
+GeoParquet.
 
 ### Statistical Analysis
 
@@ -183,6 +192,10 @@ construction (r = 0.40 in our design), making it well suited to models that
 include both terms; it is the standard ruggedness metric in wildlife
 habitat analysis [33].
 
+![Figure 2. Terrain covariates on the 30-m analysis grid, clipped to
+Nevada: elevation, slope, and the Vector Ruggedness
+Measure.](v4/figs/terrain.png)
+
 The roads dataset comprised all Census TIGER/Line road classes (MTFCC
 schema), including local roads and unimproved vehicular trails, which
 dominate road length within the study area. As in previous analyses of this
@@ -201,7 +214,7 @@ available-sample mean and its 85% confidence interval (S1 Table).
 We calculated the prediction values for the RSF using logistic regression
 with used (n = 718) and available (n = 7,180) points. Prior to running the
 models, we checked for multicollinearity among explanatory variables and
-found no pairwise correlation more extreme than |0.6|. We then generated 12
+found no pairwise correlation more extreme than |0.6| (Fig. 3). We then generated 12
 a priori models (Table 3) using different combinations of the covariates.
 In R [29], we fit each model with the base `glm` function and ranked models
 by AICc using the MuMIn package [34]. We tested our top three models'
@@ -220,10 +233,20 @@ area was scored in blocked array computation, producing a probability
 surface that was then classified into five bins of use probability using a
 quantile classification (Fig. 4).
 
+![Figure 3. Pearson correlations among continuous
+predictors.](v4/figs/correlation.png){width=55%}
+
 ## Results
 
 Our statewide results are based on 718 active lek sites and 7,180 randomly
-generated available points. The models that included ruggedness, slope,
+generated available points. Used sites separated visibly from availability
+on slope, ruggedness, and elevation before any model was fit (Figs. 4–5).
+
+![Figure 4. Continuous predictor distributions at used and available
+sites.](v4/figs/distributions.png)
+
+![Figure 5. Used versus available sites, box-and-whisker (whiskers 1.5×IQR,
+outliers suppressed for scale).](v4/figs/boxplots.png) The models that included ruggedness, slope,
 direction (aspect), elevation, and vegetation cover types carried the most
 AICc weight, as these explanatory variables occurred in all top three
 models (Table 3). We found less support for road proximity and curvature.
@@ -247,17 +270,26 @@ against 0.00197 across availability — display grounds occupy terrain
 roughly four times smoother than the landscape offers. Relative to
 shrubland, grassland and exotic herbaceous cover types sat above the
 reference while conifer, sparsely vegetated, and riparian classes fell
-below, with conifer most strongly avoided. Leks were less likely to be
+below, with conifer most strongly avoided (Fig. 6).
+
+![Figure 6. Vegetation physiognomy at used versus available
+sites.](v4/figs/veg_proportions.png) Leks were less likely to be
 located on N-, NW-, S-, SW-, and W-facing slopes relative to E-facing
 slopes. Road proximity did not significantly affect the probability of lek
 occurrence. The averaged model discriminated well between used and available sites
 (AUC = 0.80; random 5-fold cross-validation 0.79 ± 0.01; spatially blocked
 5-fold cross-validation 0.80 ± 0.03), and predicted probabilities were well
-calibrated across deciles. Predicted probability at used leks was
+calibrated across deciles (Fig. 7). Evaluated against the final prediction
+surface, the continuous Boyce index was 0.84, with the predicted-to-expected
+ratio rising from 0.4 in the lowest predicted-probability class to 7.7 in
+the highest (S2 Table).
+
+![Figure 7. Calibration: mean predicted probability versus observed use
+rate by decile.](v4/figs/calibration.png){width=45%} Predicted probability at used leks was
 uncorrelated with peak male counts (Spearman ρ = 0.07), indicating the
 surface characterizes lek placement rather than lek size [6].
 
-![Figure 4. Predicted probabilities of greater sage-grouse lek occurrence in
+![Figure 8. Predicted probabilities of greater sage-grouse lek occurrence in
 the state of Nevada, USA. Probabilities are classified into five bins of use
 probability using a quantile
 classification.](v4/figs/prediction_map_v4.png){width=62%}
@@ -394,3 +426,8 @@ Coates 2021; Manly 2007; Aldridge & Boyce 2007; Aldridge 2008; Carpenter
 mean of each continuous variable used in the RSF.
 
 {{< include v4/tables/validation.md >}}
+
+**S2 Table.** Continuous Boyce evaluation: predicted-to-expected ratio by
+probability class.
+
+{{< include v4/tables/boyce.md >}}
