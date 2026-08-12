@@ -33,8 +33,9 @@ the highest potential of lek presence and identify environmental attributes
 characteristic of lek sites using a resource selection function (RSF). We
 incorporated 30-m resolution spatial data with the coordinate locations of
 currently active lek sites to model site selection across the species'
-152,458-km² distribution in Nevada, USA. We generated 12 a priori models
-using different covariates to predict lek occurrence. Leks were more likely
+152,458-km² distribution in Nevada, USA. We generated 15 a priori models
+using different covariate combinations, including models distinguishing
+paved from unpaved road classes, to predict lek occurrence. Leks were more likely
 to occur at higher elevations (model-averaged β = 0.96, 85% CI 0.87 – 1.05)
 and less likely to occur on steeper slopes (β = −1.18, 85% CI −1.32 – −1.04)
 and on rugged terrain measured by the Vector Ruggedness Measure (β = −1.01,
@@ -254,12 +255,15 @@ supporting charts below).
 **Table 2.** MTFCC classes aggregated to usage groups.
 
 {{< include v4/tables/mtfcc_usage.md >}}
- As in previous analyses of this
-system, we treated all roads as equal and modeled the Euclidean distance to
-the nearest road on the DEM grid to ensure cell-location continuity with
-the elevation-derived rasters. Finally, elevation, aspect, slope,
-curvature, ruggedness, distance to roads, and vegetation cover types were
-sampled at each used and available location. To validate that we had enough
+ From the merged network we computed three Euclidean-distance surfaces on
+the DEM grid, ensuring cell-location continuity with the elevation-derived
+rasters: distance to any road, distance to paved roads (MTFCC S1100, S1200,
+S1630), and distance to unpaved roads and vehicular trails (S1400, S1500).
+The class-specific surfaces allow the models to separate a disturbance
+signal (proximity to high-use roads) from an association with the
+unimproved routes that thread open terrain. Finally, elevation, aspect,
+slope, curvature, ruggedness, the three road-distance measures, and
+vegetation cover types were sampled at each used and available location. To validate that we had enough
 random points to assess available habitat, we compared the mean of the
 study area's pixels for each continuous variable (estimated with a dense
 100,000-point Monte Carlo sample at full raster resolution) against the
@@ -319,7 +323,7 @@ models (Table 3). We found less support for road proximity and curvature.
 VIF for the top three models indicated limited correlation among
 explanatory variables (1.0–1.6).
 
-**Table 3.** Model selection for the 12 a priori models.
+**Table 3.** Model selection for the 15 a priori models.
 
 {{< include v4/tables/model_selection.md >}}
 
