@@ -234,7 +234,7 @@ containing almost no used points cannot support a stable coefficient, and
 retaining such classes produced quasi-complete separation (inflated
 coefficients with standard errors in the hundreds) in earlier fits of this
 dataset. DEM derivatives
-included aspect, slope, curvature, and ruggedness. Curvature is total
+included aspect, slope, curvature, and ruggedness (Fig. 2). Curvature is total
 surface curvature — the sum of profile and tangential components, in the
 sign convention of the ArcGIS Curvature tool — where positive values
 indicate locally convex-upward terrain (ridges, knolls) and negative values
@@ -268,12 +268,11 @@ aspect, and major vegetation classes.](v4/figs/covariate_multiples.png)
 
 The roads dataset comprised all Census TIGER/Line road classes (MTFCC
 schema) — 100,790 km of road within the study area — dominated by local
-roads and unimproved vehicular trails (Table 1, Table 2; Figs. 2a–2b in
-supporting charts below).
+roads and unimproved vehicular trails (Table 1, Table 2; Figs. 3–4).
 
-![Road length in the study area by MTFCC class.](v4/figs/roads_by_class.png){width=70%}
+![Figure 3. Road length in the study area by MTFCC class.](v4/figs/roads_by_class.png){width=70%}
 
-![Road length in the study area by usage group.](v4/figs/roads_by_usage.png){width=65%}
+![Figure 4. Road length in the study area by usage group.](v4/figs/roads_by_usage.png){width=65%}
 
 **Table 1.** MTFCC classes present in the study area.
 
@@ -302,7 +301,7 @@ We calculated the prediction values for the RSF using logistic regression
 with used (n = 718) and available (n = 7,180) points. Prior to running the
 models, we checked for multicollinearity among explanatory variables: no
 pair of covariates appearing together in any single model exceeded |r| =
-0.6 (Fig. 3). (Distance to any road and distance to unpaved roads are
+0.6 (Fig. 5). (Distance to any road and distance to unpaved roads are
 nearly collinear, r = 0.99, because unpaved routes dominate the network;
 these two variables never co-occur in a model.) We fit the twelve
 a priori models of the original study design — combinations of the terrain,
@@ -353,7 +352,7 @@ To generate prediction values across the study area, the averaged model was
 applied directly to the covariate rasters: every 30-m cell in the study
 area was scored in blocked array computation, producing a probability
 surface that was then classified into five bins of use probability using a
-quantile classification (Fig. 8). Because the used:available ratio is fixed
+quantile classification. Because the used:available ratio is fixed
 by design, fitted values are relative indices of selection rather than
 absolute probabilities of lek occurrence [41]; we accordingly interpret the
 surface through its ranks — quantile classes, rank correlations, and the
@@ -364,19 +363,19 @@ we cross-tabulated each used lek's vegetation class between the LF2016 and
 LF2025 LANDFIRE eras and refit the top model excluding all class-changed
 leks.
 
-![Figure 3. Pearson correlations among continuous
+![Figure 5. Pearson correlations among continuous
 predictors.](v4/figs/correlation.png){width=55%}
 
 ## Results
 
 Our statewide results are based on 718 active lek sites and 7,180 randomly
 generated available points. Used sites separated visibly from availability
-on slope, ruggedness, and elevation before any model was fit (Figs. 4–5).
+on slope, ruggedness, and elevation before any model was fit (Figs. 6–7).
 
-![Figure 4. Continuous predictor distributions at used and available
+![Figure 6. Continuous predictor distributions at used and available
 sites.](v4/figs/distributions.png)
 
-![Figure 5. Used versus available sites, box-and-whisker (whiskers 1.5×IQR,
+![Figure 7. Used versus available sites, box-and-whisker (whiskers 1.5×IQR,
 outliers suppressed for scale).](v4/figs/boxplots.png)
 
 The three road-class models ranked above all twelve original formulations
@@ -397,17 +396,18 @@ vegetation contrasts relative to shrubland).
 
 {{< include v4/tables/coefficients.md >}}
 
-![Model-averaged coefficients with 85% CIs (forest plot). Red indicates
+![Figure 8. Model-averaged coefficients with 85% CIs (forest plot). Red indicates
 negative estimates and blue positive; open symbols mark effects whose 85%
 CI crosses zero. Vegetation (Veg:) rows are contrasts relative to
 shrubland; aspect rows are contrasts relative to east-facing
 slopes.](v4/figs/forest.png){width=70%}
 
-![Marginal response curves from the top model: predicted probability of lek
+![Figure 9. Marginal response curves from the top model: predicted probability of lek
 occurrence across each covariate's observed range, others held at
 reference values.](v4/figs/response_curves.png)
 
-Based on the model-averaged results, leks were more likely to occur at
+Based on the model-averaged results (Table 4; Figs. 8–9), leks were more
+likely to occur at
 higher elevations (β = 0.94, 85% CI 0.85 – 1.03) and less likely to occur
 on steeper slopes (β = −1.31, 85% CI −1.47 – −1.16) and on rugged terrain
 (VRM; β = −1.02, 85% CI −1.27 – −0.76); mean VRM at used lek sites was
@@ -420,9 +420,9 @@ without reaching significance (β = 0.20, 85% CI −0.06 – 0.46); exotic
 tree-shrub and riparian classes were avoided; and conifer cover contained
 fewer than five of the 718 used leks — near-complete absence — entering the
 pooled rarely-used category, which was strongly avoided (β = −2.57, 85% CI
-−3.06 – −2.07) (Fig. 6).
+−3.06 – −2.07) (Fig. 10).
 
-![Figure 6. Vegetation physiognomy at used versus available
+![Figure 10. Vegetation physiognomy at used versus available
 sites.](v4/figs/veg_proportions.png) Leks were less likely to be
 located on NE-, NW-, SW-, and W-facing slopes relative to E-facing slopes;
 effects for N- and S-facing slopes did not differ from the reference at the
@@ -435,17 +435,17 @@ coefficient (β = −0.42, 85% CI −0.55 – −0.29), indicating avoidance of
 locally convex microtopography.
 
 The averaged model discriminated well between used and available sites
-(AUC = 0.81; random 5-fold cross-validation 0.80 ± 0.01; spatially blocked
+(AUC = 0.81, Fig. 11; random 5-fold cross-validation 0.80 ± 0.01; spatially blocked
 5-fold cross-validation of the top model 0.80 ± 0.04), and predicted
-values tracked observed use rates across deciles (Fig. 7) — internally
+values tracked observed use rates across deciles (Fig. 12) — internally
 consistent, noting that fitted values are relative selection indices rather
 than absolute occurrence probabilities. Evaluated
 against the final prediction surface, the continuous Boyce index was 0.92
-(S2 Table): lek density rises nearly monotonically across the
+(Fig. 13; S2 Table): lek density rises nearly monotonically across the
 predicted-suitability gradient, and cells in the highest probability class
 hold leks at more than six times the rate their area alone would predict. Externally, the surface correlated positively with the USGS
-telemetry-based spring habitat selection categories (Spearman ρ = 0.53 at
-~147,000 common locations): 46% of the USGS lowest-selection cells fell in
+telemetry-based spring habitat selection categories (Fig. 14; Spearman
+ρ = 0.53 at ~147,000 common locations): 46% of the USGS lowest-selection cells fell in
 our lowest quantile bin and 41% of their highest-selection cells in our
 highest — aligned with independent data while retaining the complementary,
 lek-specific information of this analysis. In the vegetation-change
@@ -456,15 +456,16 @@ herbaceous coefficients essentially unchanged, while the grassland
 coefficient attenuated from 0.43 to 0.21, and we interpret grassland
 selection with corresponding caution.
 
-![Figure 7. Calibration: mean predicted probability versus observed use
+![Figure 11. Receiver operating characteristic (ROC) curve for the top
+model.](v4/figs/roc.png){width=40%}
+
+![Figure 12. Calibration: mean predicted probability versus observed use
 rate by decile.](v4/figs/calibration.png){width=45%}
 
-![ROC curve, top model.](v4/figs/roc.png){width=40%}
-
-![Boyce evaluation: predicted-to-expected ratio by probability
+![Figure 13. Boyce evaluation: predicted-to-expected ratio by probability
 class.](v4/figs/boyce_curve.png){width=48%}
 
-![External comparison against the USGS telemetry-based spring
+![Figure 14. External comparison against the USGS telemetry-based spring
 habitat-selection categories, clipped to the study
 area.](v4/figs/usgs_side_by_side.png)
 
@@ -476,21 +477,24 @@ lowest bin, and 41% of their highest-selection cells fall in our highest.
 
 Predicted probability at used leks was
 uncorrelated with peak male counts (Spearman ρ = 0.04), indicating the
-surface characterizes lek placement rather than lek size [6].
+surface characterizes lek placement rather than lek size [6]. The
+classified surface is mapped statewide in Fig. 15, with each quantile class
+isolated in Fig. 16 and a 60-km window resolved at full 30-m detail in
+Fig. 17.
 
-![Figure 8. Predicted probabilities of greater sage-grouse lek occurrence in
+![Figure 15. Predicted probabilities of greater sage-grouse lek occurrence in
 the state of Nevada, USA. Probabilities are classified into five bins of use
 probability using a quantile
 classification.](v4/figs/prediction_map_v4.png){width=62%}
 
 {{< include v4/tables/prediction_bins_v4.md >}}
 
-![Each quantile class isolated (equal-area by construction). The
+![Figure 16. Each quantile class isolated (equal-area by construction). The
 highest-probability class alone constitutes the survey-targeting product:
 one-fifth of the study area capturing the terrain-and-vegetation conditions
 of active leks.](v4/figs/prediction_bins_multiples.png)
 
-![Fine-scale structure of the prediction surface: the statewide map with a
+![Figure 17. Fine-scale structure of the prediction surface: the statewide map with a
 60-km window (Tuscarora Mountains area, selected for terrain diversity)
 resolved at full 30-m detail.](v4/figs/prediction_zoom.png)
 
