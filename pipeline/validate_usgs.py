@@ -103,17 +103,21 @@ body = "".join(
     '<tr><th style="text-align:left;padding:4px 12px;font-weight:normal">'
     f'{idx}</th>{"".join(_cell(v) for v in row.values)}</tr>'
     for idx, row in cdf.iterrows())
+FOOTNOTE = (
+    "USGS classes are percentile thresholds of their habitat-selection "
+    "index (non-habitat < 5th percentile; low 5th–25th; moderate "
+    "25th–50th; high > 50th) — four classes of deliberately unequal "
+    "area, unlike our five equal-area quantile bins, so the comparison "
+    "is ordinal rather than class-for-class. Because our bins are "
+    "equal-area, every cell would read ~20% if the two maps were "
+    "unrelated; departures from 20% are the signal.\n")
 with open(ROOT / "reports/v4/tables/usgs_contingency.md", "w") as f:
     f.write('<table style="border-collapse:collapse;margin:0.5em 0">'
             f'<thead><tr><th></th>{head}</tr></thead>'
-            f'<tbody>{body}</tbody></table>\n\n'
-            "USGS classes are percentile thresholds of their habitat-selection "
-            "index (non-habitat < 5th percentile; low 5th–25th; moderate "
-            "25th–50th; high > 50th) — four classes of deliberately unequal "
-            "area, unlike our five equal-area quantile bins, so the comparison "
-            "is ordinal rather than class-for-class. Because our bins are "
-            "equal-area, every cell would read ~20% if the two maps were "
-            "unrelated; departures from 20% are the signal.\n")
+            f'<tbody>{body}</tbody></table>\n\n' + FOOTNOTE)
+# plain-markdown twin for non-HTML formats (PDF), which drop raw HTML
+with open(ROOT / "reports/v4/tables/usgs_contingency_plain.md", "w") as f:
+    f.write(cdf.map(lambda x: f"{x:.0%}").to_markdown() + "\n\n" + FOOTNOTE)
 msg = (f"USGS raster: {target['name']}\n"
        f"common valid points: {len(ours):,} of 150,000\n"
        f"Spearman(ours, USGS): {rho:.3f}\n")

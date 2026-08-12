@@ -14,6 +14,14 @@ format:
     embed-resources: true
     toc: true
     theme: cosmo
+  typst:
+    papersize: us-letter
+    margin:
+      x: 1in
+      y: 1in
+    fontsize: 10.5pt
+    include-before-body:
+      - text: "#set figure(numbering: none)"
 ---
 
 ¹ Department of Plant and Wildlife Sciences, Brigham Young University, Provo, Utah 84602.
@@ -480,7 +488,13 @@ shading scales with each row's share): the gradient is monotone — 46% of
 USGS non-habitat falls in our lowest bin, and 41% of their high-habitat
 cells fall in our highest.
 
+::: {.content-visible when-format="html"}
 {{< include v4/tables/usgs_contingency.md >}}
+:::
+
+::: {.content-visible unless-format="html"}
+{{< include v4/tables/usgs_contingency_plain.md >}}
+:::
 
 Predicted probability at used leks was
 uncorrelated with peak male counts (Spearman ρ = 0.04), indicating the
