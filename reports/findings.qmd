@@ -103,7 +103,7 @@ specific texture — cells classified as "rugged" agreed only 63% of the time
 across DEM vintages (chance = 50%) — and nearly uncorrelated with terrain
 geometry. VRM is the standard ruggedness measure in the wildlife-habitat
 literature and is decorrelated from slope by construction (r = 0.40 in our
-design; VIF ≤ 1.5).
+design; VIF ≤ 1.8).
 
 ![All predictor surfaces at 30 m (EPSG:5070), read from the pipeline's
 Cloud-Optimized GeoTIFFs.](v4/figs/covariate_multiples.png)
