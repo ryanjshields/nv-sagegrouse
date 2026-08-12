@@ -1,6 +1,6 @@
 # /// script
 # requires-python = ">=3.10"
-# dependencies = ["rasterio", "numpy", "pandas", "geopandas>=1.0", "pyogrio", "pyarrow", "matplotlib"]
+# dependencies = ["rasterio", "numpy", "pandas", "geopandas>=1.0", "pyogrio", "pyarrow", "matplotlib", "tabulate"]
 # ///
 """map_panels.py -- the fine-scale zoom panel, USGS side-by-side, and Boyce
 P/E curve figure. Zoom window fixed on the Tuscarora Mountains area, chosen
@@ -56,7 +56,10 @@ fig.suptitle("Fine-scale prediction structure invisible at state scale", fontsiz
 fig.savefig(FIGS / "prediction_zoom.png", dpi=150, bbox_inches="tight")
 plt.close(fig)
 
-# --- USGS side-by-side: their spring selection categories on our grid ----------
+# --- USGS side-by-side v2: study-area clipped, legended, bin-vs-category ------
+from rasterio.features import rasterize as rasterize_feat
+sa_gdf = gpd.read_file(D / "design/study_area_5070.gpkg")
+sa_geom = sa_gdf.geometry.iloc[0]
 with rasterio.open(D / "usgs/GrSG_Spring_Selection_Categories.tif") as usrc:
     with WarpedVRT(usrc, crs="EPSG:5070") as vrt:
         uwin = from_bounds(bnd.left, bnd.bottom, bnd.right, bnd.top, vrt.transform)
@@ -65,20 +68,48 @@ with rasterio.open(D / "usgs/GrSG_Spring_Selection_Categories.tif") as usrc:
 if und is not None:
     theirs[theirs == und] = np.nan
 theirs[theirs < 0] = np.nan
+# mask both layers to the study area on the display grid
+t_disp = rasterio.transform.from_bounds(bnd.left, bnd.bottom, bnd.right, bnd.top, ow, oh)
+sa_mask = rasterize_feat([(sa_geom, 1)], out_shape=(oh, ow), transform=t_disp, fill=0).astype(bool)
+theirs[~sa_mask] = np.nan
+bin_state_sa = np.where(sa_mask, bin_state, np.nan)
 
-fig, axes = plt.subplots(1, 2, figsize=(11, 5.8))
-axes[0].imshow(bin_state, cmap=ListedColormap(COLORS), vmin=0, vmax=4,
-               extent=(bnd.left, bnd.right, bnd.bottom, bnd.top))
-axes[0].set_title("this study: lek-site RSF (quantile bins)", fontsize=10)
-im = axes[1].imshow(theirs, cmap="viridis",
-                    extent=(bnd.left, bnd.right, bnd.bottom, bnd.top))
-axes[1].set_title("USGS spring habitat-selection categories\n(telemetry-based; ver. 3.0 2025)", fontsize=10)
+cats = sorted(int(c) for c in np.unique(theirs[np.isfinite(theirs)]))
+cat_cmap = ListedColormap(plt.cm.viridis(np.linspace(0, 1, len(cats))))
+fig, axes = plt.subplots(1, 2, figsize=(11.5, 6))
+im0 = axes[0].imshow(bin_state_sa, cmap=ListedColormap(COLORS), vmin=0, vmax=4,
+                     extent=(bnd.left, bnd.right, bnd.bottom, bnd.top))
+axes[0].set_title("this study: lek-site RSF, quantile bins", fontsize=10)
+cb0 = fig.colorbar(im0, ax=axes[0], shrink=0.5, ticks=[0.4, 1.2, 2.0, 2.8, 3.6])
+cb0.ax.set_yticklabels(["very low", "low", "moderate", "high", "very high"], fontsize=7)
+theirs_idx = np.full_like(theirs, np.nan)
+for i, c in enumerate(cats):
+    theirs_idx[theirs == c] = i
+im1 = axes[1].imshow(theirs_idx, cmap=cat_cmap, vmin=-0.5, vmax=len(cats) - 0.5,
+                     extent=(bnd.left, bnd.right, bnd.bottom, bnd.top))
+axes[1].set_title("USGS spring habitat-selection categories\n(telemetry-based, ver. 3.0 2025)", fontsize=10)
+cb1 = fig.colorbar(im1, ax=axes[1], shrink=0.5, ticks=range(len(cats)))
+cb1.ax.set_yticklabels([f"category {c}" for c in cats], fontsize=7)
 for ax in axes:
     nv.boundary.plot(ax=ax, color="#444", linewidth=0.6)
     ax.set_axis_off()
-fig.suptitle("External comparison: Spearman ρ = 0.52 at 147,036 locations", fontsize=11)
+fig.suptitle("External comparison within the study area (Spearman \u03c1 = 0.52)", fontsize=11)
 fig.savefig(FIGS / "usgs_side_by_side.png", dpi=150, bbox_inches="tight")
 plt.close(fig)
+
+# contingency: their category (rows) x our bin (cols), row-normalized
+both_ok = np.isfinite(theirs_idx) & np.isfinite(bin_state_sa)
+tab = np.zeros((len(cats), 5))
+for i in range(len(cats)):
+    for j in range(5):
+        tab[i, j] = np.sum((theirs_idx == i) & (bin_state_sa == j) & both_ok)
+row_tot = tab.sum(axis=1, keepdims=True); row_tot[row_tot == 0] = 1
+tab_pct = tab / row_tot
+labels5 = ["very low", "low", "moderate", "high", "very high"]
+cdf = pd.DataFrame(tab_pct, index=[f"USGS cat {c}" for c in cats],
+                   columns=[f"ours {l}" for l in labels5])
+with open(ROOT / "reports/v4/tables/usgs_contingency.md", "w") as f:
+    f.write(cdf.map(lambda x: f"{x:.0%}").to_markdown() + "\n")
 
 # --- Boyce P/E curve -------------------------------------------------------------
 pts = pd.read_parquet(D / "design/design_points.parquet")

@@ -98,3 +98,31 @@ fig.savefig(FIGS / "vegetation.png", dpi=150, bbox_inches="tight")
 plt.close(fig)
 
 print("FIGURES_COMPLETE:", sorted(p.name for p in FIGS.glob("*.png")))
+
+# --- Forest plot v2: split panels, independent scales ---------------------------
+betas = pd.read_csv(ROOT / "reports/v4/averaged_betas.csv", index_col=0)
+b = betas[~betas.index.str.contains("Intercept")][["Estimate", "ci85_low", "ci85_high"]]
+terrain = b[b.index.str.startswith(("scale_", "Direction"))]
+veg = b[b.index.str.startswith("Vegetation")]
+veg = veg[(veg.ci85_high - veg.ci85_low) < 20]   # drop separation-fossil CIs, note in caption
+def clean(ix):
+    return (ix.str.replace("scale_", "", regex=False)
+              .str.replace("Direction", "Aspect: ", regex=False)
+              .str.replace("Vegetation", "", regex=False))
+fig, axes = plt.subplots(1, 2, figsize=(11, 4.8))
+for ax, dat, title in [(axes[0], terrain, "Terrain, roads, aspect"),
+                       (axes[1], veg, "Vegetation (vs shrubland)")]:
+    d = dat.sort_values("Estimate")
+    yy = np.arange(len(d))
+    colors = ["#a05252" if v < 0 else "#3a6ea5" for v in d.Estimate]
+    ax.hlines(yy, d.ci85_low, d.ci85_high, color=colors, linewidth=1.6)
+    ax.scatter(d.Estimate, yy, color=colors, zorder=3, s=22)
+    ax.axvline(0, color="#777", linewidth=0.9)
+    ax.set_yticks(yy); ax.set_yticklabels(clean(d.index), fontsize=8)
+    ax.set_title(title, fontsize=10)
+    ax.set_xlabel("standardized coefficient (85% CI)")
+fig.suptitle("Model-averaged effects, top three models", fontsize=11)
+fig.tight_layout()
+fig.savefig(FIGS / "forest.png", dpi=150, bbox_inches="tight")
+plt.close(fig)
+print("FOREST_V2_COMPLETE")

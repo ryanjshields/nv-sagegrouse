@@ -30,19 +30,21 @@ TABLES.mkdir(parents=True, exist_ok=True)
 
 pts = pd.read_parquet(D / "design/model_input.parquet")
 CONT = [("elevation", "Elevation (m)"), ("slope", "Slope (°)"), ("tri", "Ruggedness (VRM)"),
-        ("curvature", "Curvature"), ("dist_road_m", "Distance to road (m)")]
+        ("curvature", "Curvature"), ("dist_road_m", "Distance to any road (m)"),
+        ("dist_paved_m", "Distance to paved road (m)"), ("dist_unpaved_m", "Distance to unpaved road (m)")]
 
 # --- Fig: used vs available distributions --------------------------------------
-fig, axes = plt.subplots(2, 3, figsize=(11, 6.5))
+fig, axes = plt.subplots(2, 4, figsize=(13.5, 6.5))
 for ax, (col, label) in zip(axes.flat, CONT):
     for use, color, name in [(0, "#9aa5b1", "available"), (1, "#3a6ea5", "used")]:
         v = pts.loc[pts.use == use, col].dropna()
-        if col in ("tri", "dist_road_m"):
+        if col in ("tri", "dist_road_m", "dist_paved_m", "dist_unpaved_m"):
             v = v[v < v.quantile(0.99)]
         ax.hist(v, bins=40, density=True, alpha=0.55, color=color, label=name)
     ax.set_title(label, fontsize=9); ax.tick_params(labelsize=7)
 axes.flat[0].legend(frameon=False, fontsize=8)
-axes.flat[-1].set_axis_off()
+for extra in axes.flat[len(CONT):]:
+    extra.set_axis_off()
 fig.suptitle("Continuous predictor distributions at used (n=718) and available (n=7,180) sites", fontsize=10)
 fig.tight_layout()
 fig.savefig(FIGS / "distributions.png", dpi=150, bbox_inches="tight")
@@ -149,10 +151,10 @@ plt.close(fig)
 print("EDA_EXTRA_COMPLETE")
 
 # --- Fig: box-and-whisker comparison, used vs available -------------------------
-fig, axes = plt.subplots(1, 5, figsize=(11.5, 3.6))
+fig, axes = plt.subplots(1, len(CONT), figsize=(2.3 * len(CONT), 3.6))
 for ax, (col, label) in zip(axes, CONT):
     data = [pts.loc[pts.use == 0, col].dropna(), pts.loc[pts.use == 1, col].dropna()]
-    if col in ("tri", "dist_road_m"):
+    if col in ("tri", "dist_road_m", "dist_paved_m", "dist_unpaved_m"):
         data = [d[d < d.quantile(0.99)] for d in data]
     bp = ax.boxplot(data, tick_labels=["avail", "used"], widths=0.55, patch_artist=True,
                     showfliers=False, medianprops=dict(color="black"))
