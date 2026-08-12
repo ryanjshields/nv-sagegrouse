@@ -30,9 +30,10 @@ def sample(path):
 pts["elevation"] = sample(D / "dem/nv_dem_5070.tif")
 pts["slope"] = sample(D / "dem/nv_slope_5070.tif")
 pts["aspect_deg"] = sample(D / "dem/nv_aspect_5070.tif")
-# Ruggedness per manuscript Equation 1: (focal avg - min)/(max - min), 3x3.
-# NOT Riley's TRI (gdaldem) -- that is ~0.995 correlated with slope and blows up VIF.
-pts["tri"] = sample(D / "dem/nv_rugg_5070.tif")
+# Ruggedness = VRM (Sappington et al. 2007), v4 canonical. Legacy options kept
+# as rasters: nv_rugg_5070.tif (manuscript Eq. 1) and nv_tri_5070.tif (Riley --
+# do NOT model with it; ~0.995 correlated with slope).
+pts["tri"] = sample(D / "dem/nv_vrm_5070.tif")
 pts["curvature"] = sample(D / "dem/nv_curv_5070.tif")
 
 def direction(a):
