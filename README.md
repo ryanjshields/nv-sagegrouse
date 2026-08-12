@@ -38,11 +38,13 @@ sensitive wildlife data** and are not distributed here or in any public bucket �
 request them from the Nevada Department of Wildlife. The pipeline reads them
 from a private bucket; see `data/MANIFEST.md`.
 
-## Notable methods corrections (2026)
+## Methods notes
 
-- The manuscript's Equation 1 ruggedness is a DEM-texture statistic that was
-  additionally binarized by an integer-raster step in the original workflow;
-  v4 replaces it with VRM. Legacy rasters are still built for era replication.
-- The manuscript's study-area figure (~3,548 km²) is inconsistent with the
-  range polygon (152,458 km²); the operative design is 10 available points
-  per used lek.
+- Ruggedness is the Vector Ruggedness Measure (Sappington et al. 2007),
+  chosen over range-position focal indices, which we found to be dominated by
+  DEM-vintage-specific texture (63% cross-vintage cell agreement, chance = 50%)
+  and near-uncorrelated with terrain geometry. Legacy indices remain buildable
+  for era replication (`history/`).
+- Study area (152,458 km²) is the USFWS 2015 sage-grouse range clipped to
+  Nevada plus 5-km buffers around active leks outside it; availability is a
+  seeded uniform sample at 10 points per used lek.
