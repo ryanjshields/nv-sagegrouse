@@ -113,7 +113,12 @@ conservation planning.
 We determined the extent of the study — **152,458 km²** — using the
 sage-grouse species distribution range for the state of Nevada, USA [32],
 combined with a 5-km buffer around active leks that fell outside the
-traditional range (Fig. 1). Sage-grouse inhabit rangelands throughout the
+traditional range (Fig. 1). The range polygon is the current-range layer
+compiled for the U.S. Fish and Wildlife Service's 2015 status review, which
+integrated the Schroeder et al. (2004) range delineation with the Priority
+Areas for Conservation identified in the 2013 Conservation Objectives Team
+report; it is distributed through USGS ScienceBase and was clipped to the
+Nevada state boundary for this analysis. Sage-grouse inhabit rangelands throughout the
 state generally characterized as high elevation, cool desert ecosystems with
 hot, dry summers and cold winters. Wyoming big sagebrush (*Artemisia
 tridentata wyomingensis*), low sagebrush (*Artemisia arbuscula*), and black
@@ -146,7 +151,38 @@ located within Nevada (n = 718), omitting all others.
 Environmental and anthropogenic data were acquired programmatically from
 their authoritative public sources, and every acquisition writes a
 provenance manifest (source URL, publication date, size) alongside the
-data:
+data.
+
+**Elevation** comes from the USGS 3D Elevation Program (3DEP), the national
+program that is systematically replacing legacy National Elevation Dataset
+sources with lidar-derived elevation. We used the seamless 1 arc-second
+(~30-m) product, distributed as one-degree cloud-optimized GeoTIFF tiles
+through The National Map API. Because the API returns multiple product
+vintages for the same tile footprint, the fetch step deduplicates to the
+most recent publication per cell; the 72 tiles used here carry publication
+vintages spanning 2013–2026, reflecting the progress of lidar acquisition
+across Nevada.
+
+**Vegetation** comes from LANDFIRE, the interagency (U.S. Department of the
+Interior and USDA Forest Service) landscape-scale mapping program. We used
+the Existing Vegetation Type (EVT) layer from the LF2025 release at its
+native 30-m resolution, requested as a statewide clip through the LANDFIRE
+Product Service API, and classified sites by the layer's physiognomy
+attribute (EVT_PHYS).
+
+**Roads** come from the U.S. Census Bureau's TIGER/Line extracts (2024
+vintage) of the MAF/TIGER database — the successor to the Feature Class
+Code (FCC) roads data used in earlier analyses of this system, now
+classified under the MTFCC schema. County-level road files include every
+class from primary highways (S1100) through local roads (S1400) and
+unimproved vehicular trails (S1500); all 17 Nevada county files were merged
+(202,967 segments).
+
+**External validation** uses the USGS data release accompanying Open-File
+Report 2024-1018 [31]: telemetry-based habitat-selection and survival
+rasters for greater sage-grouse in Nevada and northeastern California
+(ver. 3.0, September 2025) [40], from which we used the spring (breeding
+season) habitat-selection categories.
 
 | Input | Service | Product | Volume |
 |---|---|---|---|
