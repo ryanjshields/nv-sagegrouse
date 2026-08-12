@@ -65,7 +65,9 @@ invasion of non-native exotic grasses, invasion of pinyon-juniper woodland,
 wildfire and novel disturbance regimes, and over-utilization of rangelands
 through excessive grazing have all contributed to the decline of sage-grouse
 [2, 5]. The potential consequence of these impacts is increased
-fragmentation and isolation of sage-grouse populations [6].
+fragmentation and isolation of sage-grouse populations [6], and range-wide
+monitoring continues to document population concern, including in the
+Bi-State region of Nevada and California [36].
 
 Sage-grouse are a lekking bird species that utilize open areas to display
 and breed [1, 7]. Because sage-grouse congregate at lek sites during the
@@ -79,7 +81,9 @@ reliable indicator of habitat quality [10]. Monitoring lek sites throughout
 the species range can help managers and researchers better understand and
 protect sage-grouse populations. Though some variation in methodology and
 sampling biases exists, lek monitoring is still useful for informing
-sage-grouse-related conservation decisions [11, 12]. A comprehensive
+sage-grouse-related conservation decisions [11, 12], and lek-count time
+series now anchor range-wide early-warning systems for population declines
+[37]. A comprehensive
 knowledge of existing lek locations and site selection is critical for
 informed conservation and management decisions related to sage-grouse.
 
@@ -237,7 +241,7 @@ deciles of predicted probability; the final surface was evaluated with the
 continuous Boyce index; and the surface was externally compared against the
 U.S. Geological Survey's independent, telemetry-based spring habitat
 selection categories for Nevada and northeastern California (ver. 3.0,
-2025) at 150,000 seeded random locations.
+2025) [40] at 150,000 seeded random locations.
 
 To generate prediction values across the study area, the averaged model was
 applied directly to the covariate rasters: every 30-m cell in the study
@@ -325,11 +329,12 @@ character of display areas [1, 7]; vegetation patterns that influence
 nesting occur at much broader scales, and males primarily select display
 areas in response to hens' preference for proximal nesting habitat.
 
-We found strong avoidance of conifer cover at lek sites. This aligns with
-the active management literature on pinyon-juniper expansion: sage-grouse
-respond favorably to conifer removal, selecting nesting and brood sites
-near treatment areas with improved survival, making lek-scale conifer
-avoidance directly actionable for treatment prioritization.
+We found strong avoidance of conifer cover at lek sites, consistent with
+lek persistence declining as conifer encroaches on surrounding sagebrush
+[38]. This aligns with the active management literature on pinyon-juniper
+expansion: sage-grouse respond favorably to conifer removal, reoccupying
+restored nesting habitat near treatment areas [39], making lek-scale
+conifer avoidance directly actionable for treatment prioritization.
 
 Leks were less likely to occur on steeper slopes and on rugged terrain, and
 more likely at higher elevations. Earlier work in Nevada reported mixed
@@ -433,6 +438,23 @@ Coates 2021; Manly 2007; Aldridge & Boyce 2007; Aldridge 2008; Carpenter
 - [35] Lautenbach JM, et al. Landscape features and seasonal habitat
   predict lek site selection and lek size of a Tympanuchus grouse.
   Ecosphere 2025;16:e70517.
+- [36] Coates PS, et al. Status of greater sage-grouse in the Bi-State
+  Distinct Population Segment — an evaluation of population trends, habitat
+  selection, and efficacy of conservation actions. USGS Open-File Report
+  2024-1030; 2024.
+- [37] Prochazka BG, et al. A targeted annual warning system developed for
+  the conservation of a sagebrush indicator species. Ecol Indic
+  2023;148:110097.
+- [38] Baruch-Mordo S, Evans JS, Severson JP, Naugle DE, Maestas JD, Kiesecker
+  JM, et al. Saving sage-grouse from the trees: a proactive solution to
+  reducing a key threat to a candidate species. Biol Conserv
+  2013;167:233–241.
+- [39] Severson JP, Hagen CA, Maestas JD, Naugle DE, Forbes JT, Reese KP.
+  Restoring sage-grouse nesting habitat through removal of early
+  successional conifer. Restor Ecol 2017;25(6):1026–1034.
+- [40] U.S. Geological Survey. Rasters representing greater sage-grouse
+  space use, habitat selection, and survival to inform habitat management
+  (ver. 3.0, September 2025) [data release]. https://doi.org/10.5066/P933VE6W.
 
 ## Supporting Information
 

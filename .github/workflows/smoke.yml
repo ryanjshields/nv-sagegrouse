@@ -1,0 +1,24 @@
+name: pipeline smoke test
+on:
+  push:
+    branches: [main, pipeline-rebuild]
+  pull_request:
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    container: ghcr.io/osgeo/gdal:ubuntu-full-3.9.2
+    steps:
+      - uses: actions/checkout@v4
+      - name: install uv + curl
+        run: |
+          apt-get update && apt-get install -y curl ca-certificates
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+      - name: run smoke test (public data, one-tile AOI)
+        run: bash pipeline/smoke_test.sh
+  docker-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: validate Dockerfile builds
+        run: docker build -t nv-sagegrouse .

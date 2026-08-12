@@ -19,13 +19,20 @@ from datetime import datetime, timezone
 
 BASE = "https://tnmaccess.nationalmap.gov/api/v1/products"
 
-def fetch_page(dataset: str, bbox: str, offset: int) -> dict:
+def fetch_page(dataset: str, bbox: str, offset: int, tries: int = 5) -> dict:
     qs = urllib.parse.urlencode({
         "datasets": dataset, "bbox": bbox, "outputFormat": "JSON",
         "max": 100, "offset": offset,
     })
-    with urllib.request.urlopen(f"{BASE}?{qs}", timeout=60) as r:
-        return json.load(r)
+    for i in range(tries):
+        try:
+            with urllib.request.urlopen(f"{BASE}?{qs}", timeout=60) as r:
+                return json.load(r)
+        except Exception as e:
+            if i == tries - 1:
+                raise
+            print(f"TNM retry {i+1} after {e}", file=sys.stderr)
+            import time; time.sleep(20 * (i + 1))
 
 def main() -> None:
     ap = argparse.ArgumentParser()
