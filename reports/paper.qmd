@@ -74,8 +74,9 @@ fragmentation and isolation of sage-grouse populations [6], and range-wide
 monitoring continues to document population concern, including in the
 Bi-State region of Nevada and California [36].
 
-Sage-grouse are a lekking bird species that utilize open areas to display
-and breed [1, 7]. Because sage-grouse congregate at lek sites during the
+Sage-grouse are a lekking bird species: males gather each spring at
+traditional communal display grounds — leks — situated in open areas, and
+breeding is concentrated at these sites [1, 7]. Because sage-grouse congregate at lek sites during the
 breeding season, these areas are often used as a focal point for monitoring
 bird populations and establishing management priorities and conservation
 objectives [3, 8]. Lek count data can help determine the presence and/or
@@ -176,12 +177,14 @@ Interior and USDA Forest Service) landscape-scale mapping program. We used
 the Existing Vegetation Type (EVT) layer from the LF2025 release at its
 native 30-m resolution, requested as a statewide clip through the LANDFIRE
 Product Service API, and classified sites by the layer's physiognomy
-attribute (EVT_PHYS).
+attribute (EVT_PHYS), which groups vegetation by growth form (e.g.,
+shrubland, grassland, conifer) rather than by floristic composition.
 
 **Roads** come from the U.S. Census Bureau's TIGER/Line extracts (2024
 vintage) of the MAF/TIGER database — the successor to the Feature Class
 Code (FCC) roads data used in earlier analyses of this system, now
-classified under the MTFCC schema. County-level road files include every
+classified under the MAF/TIGER Feature Class Code (MTFCC)
+schema. County-level road files include every
 class from primary highways (S1100) through local roads (S1400) and
 unimproved vehicular trails (S1500); all 17 Nevada county files were merged
 (202,967 segments).
@@ -231,7 +234,11 @@ containing almost no used points cannot support a stable coefficient, and
 retaining such classes produced quasi-complete separation (inflated
 coefficients with standard errors in the hundreds) in earlier fits of this
 dataset. DEM derivatives
-included aspect, slope, curvature, and ruggedness. We elected to use a 30-m
+included aspect, slope, curvature, and ruggedness. Curvature is total
+surface curvature — the sum of profile and tangential components, in the
+sign convention of the ArcGIS Curvature tool — where positive values
+indicate locally convex-upward terrain (ridges, knolls) and negative values
+indicate concave terrain (swales, drainages). We elected to use a 30-m
 DEM to examine patterns at a fine scale across the region. We accounted for
 anthropogenic activity by calculating the Euclidean distance from each site
 to the nearest road. All data processing is automated and documented in an
@@ -316,9 +323,15 @@ variance inflation factors (VIF) to further inspect for multicollinearity,
 considering VIF > 10 indicative of collinearity [22, 27]; all variables in
 all top models had VIF ≤ 1.8. To account for the uncertainty inherent in
 model selection, we averaged beta coefficients from our top three models
-using the full (zero-substitution) average in MuMIn, and report 85%
-confidence intervals consistent with AIC-based selection (Table 4). Model discrimination was assessed
-with the area under the ROC curve on the fitted model average, under random
+using the full average in MuMIn, in which a covariate absent from a model
+contributes zero to that model's term rather than being omitted, and report
+85% confidence intervals, the interval width consistent with AIC-based
+model selection [43] (Table 4). Model discrimination was assessed
+with the area under the receiver operating characteristic (ROC) curve
+(AUC) — the probability that a randomly chosen used site receives a higher
+predicted value than a randomly chosen available site, where 0.5 indicates
+discrimination no better than chance and 1 indicates perfect ranking — on
+the fitted model average, under random
 5-fold cross-validation, and under spatially blocked 5-fold
 cross-validation (k-means coordinate blocks), and calibration was inspected
 by deciles of predicted probability. The final surface was evaluated with
@@ -340,7 +353,12 @@ To generate prediction values across the study area, the averaged model was
 applied directly to the covariate rasters: every 30-m cell in the study
 area was scored in blocked array computation, producing a probability
 surface that was then classified into five bins of use probability using a
-quantile classification (Fig. 8). To assess sensitivity to post-2018
+quantile classification (Fig. 8). Because the used:available ratio is fixed
+by design, fitted values are relative indices of selection rather than
+absolute probabilities of lek occurrence [41]; we accordingly interpret the
+surface through its ranks — quantile classes, rank correlations, and the
+Boyce index — rather than through the magnitude of any single predicted
+value. To assess sensitivity to post-2018
 vegetation change (including large wildfires such as the 2018 Martin Fire),
 we cross-tabulated each used lek's vegetation class between the LF2016 and
 LF2025 LANDFIRE eras and refit the top model excluding all class-changed
@@ -417,7 +435,9 @@ locally convex microtopography.
 The averaged model discriminated well between used and available sites
 (AUC = 0.81; random 5-fold cross-validation 0.80 ± 0.01; spatially blocked
 5-fold cross-validation of the top model 0.80 ± 0.04), and predicted
-probabilities were well calibrated across deciles (Fig. 7). Evaluated
+values tracked observed use rates across deciles (Fig. 7) — internally
+consistent, noting that fitted values are relative selection indices rather
+than absolute occurrence probabilities. Evaluated
 against the final prediction surface, the continuous Boyce index was 0.92
 (S2 Table): lek density rises nearly monotonically across the
 predicted-suitability gradient, and cells in the highest probability class
@@ -630,6 +650,8 @@ Coates 2021; Manly 2007; Aldridge & Boyce 2007; Aldridge 2008; Carpenter
 - [42] Hirzel AH, Le Lay G, Helfer V, Randin C, Guisan A. Evaluating the
   ability of habitat suitability models to predict species presences. Ecol
   Model 2006;199(2):142–152.
+- [43] Arnold TW. Uninformative parameters and model selection using
+  Akaike's Information Criterion. J Wildl Manage 2010;74(6):1175–1178.
 
 ## Supporting Information
 
