@@ -33,7 +33,7 @@ g_active = gpd.GeoDataFrame(
     crs="EPSG:26911",
 ).to_crs("EPSG:5070")
 
-rng_nv = gpd.read_file(ROOT / "data-local/study-area/range_nv.shp").to_crs("EPSG:5070")
+rng_nv = gpd.read_parquet(ROOT / "data-local/vectors/grsg_range_nv_5070.parquet").to_crs("EPSG:5070")
 range_union = rng_nv.union_all()
 
 # 5-km buffers around active leks OUTSIDE the range polygon (v4: active-only, per Dec-2023 bug fix)

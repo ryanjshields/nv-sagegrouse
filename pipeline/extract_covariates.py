@@ -60,7 +60,7 @@ else:
     print("WARNING: no LANDFIRE tif found -- evt_phys skipped this pass")
 
 # Distance to nearest road (m), EPSG:5070
-roads = gpd.read_file(D / "roads/tl_2024_32_prisecroads.shp").to_crs("EPSG:5070")
+roads = gpd.read_parquet(D / "vectors/nv_prisecroads_5070.parquet").to_crs("EPSG:5070")
 gpts = gpd.GeoDataFrame(pts, geometry=gpd.points_from_xy(pts.x, pts.y), crs="EPSG:5070")
 joined = gpd.sjoin_nearest(gpts, roads[["geometry"]], distance_col="dist_road_m")
 pts["dist_road_m"] = joined.groupby(joined.index)["dist_road_m"].min()
