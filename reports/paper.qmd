@@ -458,7 +458,7 @@ than absolute occurrence probabilities. Evaluated
 against the final prediction surface, the continuous Boyce index was 0.92
 (Fig. 13; S2 Table): lek density rises nearly monotonically across the
 predicted-suitability gradient, and cells in the highest probability class
-hold leks at more than six times the rate their area alone would predict. Externally, the surface correlated positively with the USGS
+hold leks at roughly six times the rate their area alone would predict. Externally, the surface correlated positively with the USGS
 telemetry-based spring habitat selection categories (Fig. 14; Spearman
 ρ = 0.53 at ~147,000 common locations): 46% of the cells the USGS classes
 as non-habitat fell in our lowest quantile bin and 41% of their

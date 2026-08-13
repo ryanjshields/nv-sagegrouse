@@ -30,8 +30,15 @@ def moving_window_pe(
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     used = _as_1d_float_array(p_used, "p_used")
     available = _as_1d_float_array(area, "area")
+    # boyce.py order: filter used values (finite, >= 0) BEFORE lo/hi and the clip.
+    used = used[np.isfinite(used) & (used >= 0.0)]
     lo = float(available.min())
     hi = float(np.quantile(available, 0.999))
+    # F10 fix (verbatim boyce.py): clip values above the 99.9th-percentile
+    # ceiling into the top window instead of excluding them, and make the final
+    # window upper-inclusive so p == hi is counted.
+    available = np.minimum(available, hi)
+    used = np.minimum(used, hi)
     width = (hi - lo) / 5.0
     starts = np.linspace(lo, hi - width, 10)
     ends = starts + width
@@ -40,9 +47,10 @@ def moving_window_pe(
     ratios: list[float] = []
     obs: list[float] = []
     exp: list[float] = []
-    for start, end in zip(starts, ends, strict=True):
-        observed = float(((used >= start) & (used < end)).mean())
-        expected = float(((available >= start) & (available < end)).mean())
+    for i, (start, end) in enumerate(zip(starts, ends, strict=True)):
+        last = i == len(starts) - 1
+        observed = float(((used >= start) & ((used <= end) if last else (used < end))).mean())
+        expected = float(((available >= start) & ((available <= end) if last else (available < end))).mean())
         obs.append(observed)
         exp.append(expected)
         if expected > 0.0:
@@ -105,7 +113,9 @@ def test_ties_use_average_ranks_before_correlation() -> None:
     assert_allclose(boyce_index(mids, pe), expected, rtol=0.0, atol=1e-12)
 
 
-# FINDING: pipeline/boyce.py:42 computes corrcoef on a zero-variance rank vector, and pipeline/boyce.py:48-49 then writes that NaN headline value to reports/v4/boyce_pe.csv without a guard.
+# FIXED (was FINDING F8): boyce.py now refuses to write artifacts when the index
+# is non-finite (SystemExit "BOYCE_DEGENERATE"). The NaN math itself is correct
+# and this test pins it: constant P/E is undefined, not neutral.
 def test_constant_pe_ratio_is_undefined_and_returns_nan() -> None:
     """Invariant: constant P/E must stay undefined because Spearman on a zero-variance rank vector is mathematically NaN, not ecological neutrality."""
     value = boyce_index([0.1, 0.2, 0.3, 0.4, 0.5], [2.0, 2.0, 2.0, 2.0, 2.0])
@@ -146,19 +156,27 @@ def test_window_geometry_overlaps_instead_of_tiling() -> None:
     assert ends[-1] > starts[0]
 
 
-# FINDING: pipeline/boyce.py:30-38 truncates classes at hi = quantile(area, 0.999), so used points with predictions >= hi are excluded from every observed class even though they are the most consequential leks for the monotonicity claim.
-def test_used_points_above_hi_are_dropped_from_every_class() -> None:
-    """Invariant: used predictions at or above the 0.999 area quantile must land in no class at all, because the final window ends at hi and the comparison is strictly less-than."""
+# FIXED (was FINDING F10): used predictions at or above hi are clipped to hi and
+# the final window is upper-inclusive, so the highest-suitability leks land in
+# the top window instead of vanishing from every class.
+def test_used_points_at_or_above_hi_land_in_the_top_window() -> None:
+    """Invariant: used predictions at or above the 0.999 area quantile must be counted in the final window, because those are exactly the leks the monotonicity claim leans on."""
     area = np.linspace(0.0, 1.0, num=1000, endpoint=False, dtype=np.float64)
     hi = float(np.quantile(area, 0.999))
-    # Every synthetic lek sits above hi -- these are the highest-suitability leks,
+    # Every synthetic lek sits at or above hi -- the highest-suitability leks,
     # exactly the ones the "lek density rises with suitability" claim leans on.
     p_used = np.array([hi, hi + 1e-4, hi + 2e-4, hi + 1e-3], dtype=np.float64)
 
-    _, _, obs, _, _, _ = moving_window_pe(p_used, area)
+    mids, ratios, obs, exp, _, _ = moving_window_pe(p_used, area)
 
-    assert obs.size > 0
-    assert_allclose(obs, 0.0, rtol=0.0, atol=0.0)
+    assert obs.size == 10
+    assert_allclose(obs[-1], 1.0, rtol=0.0, atol=0.0)
+    assert_allclose(obs[:-1], 0.0, rtol=0.0, atol=0.0)
+    # The clip pushes area mass INTO the top window, so exp > 0 there is
+    # structural -- the retained P/E ladder (what boyce.py writes to
+    # boyce_pe.csv) must therefore include the top window, not drop it.
+    assert exp[-1] > 0.0
+    assert mids.size == ratios.size == 10
 
 
 # FINDING: pipeline/boyce.py:31-35 counts each used point once per overlapping window, so the "proportion of used leks in class i" at boyce.py:35 is not a partition and the ten observed shares sum to well above one.

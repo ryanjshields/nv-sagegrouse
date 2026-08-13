@@ -23,28 +23,42 @@ ROOT = Path(__file__).resolve().parent.parent
 D = ROOT / "data-local"
 ITEM = "65f389f9d34e9853bbf0e813"
 
-api = f"https://www.sciencebase.gov/catalog/item/{ITEM}?format=json&fields=files"
-with urllib.request.urlopen(api, timeout=120) as r:
-    files = json.load(r).get("files", [])
-tifs = [f for f in files if f.get("name", "").lower().endswith((".tif", ".tiff", ".img", ".zip"))]
-print("candidate files:")
-for f in tifs[:40]:
-    print("  ", f.get("name"), f.get("size"))
+# Pin the expected release filename; the keyword heuristic is only a fallback
+# so a ScienceBase rename cannot silently swap the comparison raster.
+EXPECTED = "GrSG_Spring_Selection_Categories.tif"
 
-def pick(files):
-    scored = []
-    for f in files:
-        n = f.get("name", "").lower()
-        if not n.endswith((".tif", ".tiff")):
-            continue
-        score = ("select" in n) * 4 + ("hsi" in n) * 3 + ("breed" in n or "spring" in n) * 2 - ("surv" in n) * 3 - ("space" in n)
-        scored.append((score, f))
-    scored.sort(key=lambda t: -t[0])
-    return scored[0][1] if scored else None
+if (D / "usgs" / EXPECTED).exists():
+    # Cache-first: the pinned raster is already on disk, so skip ScienceBase
+    # discovery entirely (the API 5xxes routinely and is not needed offline).
+    target = {"name": EXPECTED}
+else:
+    api = f"https://www.sciencebase.gov/catalog/item/{ITEM}?format=json&fields=files"
+    with urllib.request.urlopen(api, timeout=120) as r:
+        files = json.load(r).get("files", [])
+    tifs = [f for f in files if f.get("name", "").lower().endswith((".tif", ".tiff", ".img", ".zip"))]
+    print("candidate files:")
+    for f in tifs[:40]:
+        print("  ", f.get("name"), f.get("size"))
 
-target = pick(tifs)
-if target is None:
-    sys.exit("no directly readable .tif candidate; inspect the file list above (may be zipped)")
+    def pick(files):
+        scored = []
+        for f in files:
+            n = f.get("name", "").lower()
+            if not n.endswith((".tif", ".tiff")):
+                continue
+            score = ("select" in n) * 4 + ("hsi" in n) * 3 + ("breed" in n or "spring" in n) * 2 - ("surv" in n) * 3 - ("space" in n)
+            scored.append((score, f))
+        scored.sort(key=lambda t: -t[0])
+        return scored[0][1] if scored else None
+
+    target = next((f for f in tifs if f.get("name") == EXPECTED), None)
+    if target is None:
+        target = pick(tifs)
+        if target is not None:
+            print(f"WARNING: expected '{EXPECTED}' not found in the item file list; "
+                  f"keyword heuristic selected '{target['name']}' -- verify before trusting the comparison")
+    if target is None:
+        sys.exit("no directly readable .tif candidate; inspect the file list above (may be zipped)")
 print("selected:", target["name"])
 local = D / "usgs" / target["name"]
 local.parent.mkdir(parents=True, exist_ok=True)
@@ -53,6 +67,8 @@ if not local.exists():
 url = str(local)
 
 sa = gpd.read_file(D / "design/study_area_5070.gpkg")
+# rng=99 is deliberately independent of the pipeline design seed (20260811):
+# the validation sample must not couple to the availability draw.
 pts = sa.sample_points(150_000, rng=99).explode(index_parts=False)
 x5, y5 = pts.x.values, pts.y.values
 

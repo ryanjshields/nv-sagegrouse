@@ -36,15 +36,31 @@ pts["aspect_deg"] = sample(D / "dem/nv_aspect_5070.tif")
 pts["tri"] = sample(D / "dem/nv_vrm_5070.tif")
 pts["curvature"] = sample(D / "dem/nv_curv_5070.tif")
 
+import numpy as _np
+
+# Ingestion gate (FINDINGS F3/F4/F11): nodata must never enter the design
+# table. A -9999 aspect would classify as "N", a -9999 slope as "Flat", and a
+# single sentinel row would shift the z-scaling moments applied to every cell
+# of the statewide surface. Reject loudly, per column, at the point of entry.
+def reject_invalid(df, cols):
+    bad = {c: int(((~_np.isfinite(df[c].astype("float64"))) | (df[c] <= -9998)).sum())
+           for c in cols}
+    bad = {c: n for c, n in bad.items() if n}
+    if bad:
+        raise SystemExit(f"INGESTION_GATE_FAILED: sentinel/NaN sampled at design points: {bad}")
+
+reject_invalid(pts, ["elevation", "slope", "aspect_deg", "tri", "curvature"])
+
 def direction(a):
-    if a is None or a != a or a < 0: return "N"
+    if a is None or a != a or a < 0:
+        raise ValueError(f"invalid aspect {a!r} reached direction(); "
+                         "nodata must be caught by the ingestion gate")
     for hi, lab in [(22.5,"N"),(67.5,"NE"),(112.5,"E"),(157.5,"SE"),(202.5,"S"),(247.5,"SW"),(292.5,"W"),(337.5,"NW"),(360.1,"N")]:
         if a <= hi: return lab
     return "N"
 # gdaldem -zero_for_flat writes aspect 0 for flat cells, which collides with
 # true north. Flat terrain (slope < 0.5 deg) gets its own category -- leks sit
 # on flat ground, so folding flat into N would contaminate the aspect effects.
-import numpy as _np
 pts["direction"] = _np.where(pts.slope < 0.5, "Flat", pts.aspect_deg.map(direction))
 
 # EVT_PHYS: sample the LANDFIRE grid, then map pixel value -> EVT_PHYS via the CSV attribute table
@@ -66,6 +82,7 @@ else:
 # Distance to nearest road (m): sampled from the all-roads Euclidean-distance
 # surface (build_roads_raster.sh) so points and prediction grid share one source.
 pts["dist_road_m"] = sample(D / "dem/nv_distroad_5070.tif")
+reject_invalid(pts, ["dist_road_m"])
 
 out = pts.drop(columns=[c for c in ("evt_val",) if c in pts])
 out.to_parquet(D / "design/model_input.parquet", index=False)

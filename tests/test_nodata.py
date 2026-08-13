@@ -45,10 +45,11 @@ def _write_raster(path: Path, values: np.ndarray, nodata: float | None) -> Path:
 
 
 def _clean_like_build_prediction(path: Path) -> np.ndarray:
-    """Reimplement build_prediction.py:96-98 exactly: masked read, fill NaN, drop |a| > 1e5."""
+    """Reimplement build_prediction.py rd() exactly: masked read, fill NaN, drop |a| > 1e5, then the F6 sentinel backstop."""
     with rasterio.open(path) as src:
         array = src.read(1, masked=True).astype("float64").filled(np.nan)
     array[np.abs(array) > 1e5] = np.nan
+    array[array == -9999.0] = np.nan
     return array
 
 
@@ -67,23 +68,20 @@ def test_hardcoded_sentinel_filter_cleans_only_minus_9999(tmp_path: Path) -> Non
     assert_allclose(clean.min(), 0.10, rtol=0.0, atol=1e-6)
 
 
-# FINDING: pipeline/boyce.py:26 filters with `area = area[area != -9999.0]` instead of
-# consulting src.nodata, so any raster carrying a different nodata sentinel keeps its
-# nodata cells. boyce.py:30 then takes lo = area.min() and width = (hi - lo)/5 from the
-# contaminated array, which relocates every one of the ten probability classes.
-@pytest.mark.xfail(
-    strict=True,
-    reason="Bug: boyce.py hardcodes -9999.0 rather than reading src.nodata; strict=True turns this red once the filter is made nodata-aware so the xfail can be deleted.",
-)
-def test_boyce_sentinel_filter_should_respect_declared_nodata(tmp_path: Path) -> None:
+# FIXED (was FINDING F7): boyce.py now consults src.nodata in addition to the
+# -9999 convention, so a declared float32 nodata is removed before lo/width.
+def test_boyce_sentinel_filter_respects_declared_nodata(tmp_path: Path) -> None:
     """Invariant: the Boyce area filter must remove whatever nodata the raster declares, because lo and the class width are derived from the array minimum."""
     values = np.array([[0.10, 0.20, 0.30], [0.40, FLOAT32_NODATA, 0.60]], dtype=np.float32)
     path = _write_raster(tmp_path / "prediction.tif", values, nodata=FLOAT32_NODATA)
 
     with rasterio.open(path) as src:
         area = src.read(1).astype("float64")
-    area = area[area != -9999.0]  # verbatim boyce.py:26
-    area = area[np.isfinite(area)]  # verbatim boyce.py:27
+        nod = src.nodata
+    area = area[np.isfinite(area)]      # verbatim boyce.py
+    area = area[area != -9999.0]        # verbatim boyce.py
+    if nod is not None:
+        area = area[area != nod]        # verbatim boyce.py (F7 fix)
 
     assert_allclose(area.min(), 0.10, rtol=0.0, atol=1e-6)
 
@@ -126,15 +124,9 @@ def test_declared_nodata_is_masked_out_of_the_scorer_read(tmp_path: Path) -> Non
     assert_allclose(cleaned[0, 0], 1000.0, rtol=0.0, atol=1e-6)
 
 
-# FINDING: pipeline/build_prediction.py:96-98 cleans with `a[np.abs(a) > 1e5] = np.nan`
-# after a masked read. |-9999| = 9999 < 1e5, so a raster carrying a -9999 sentinel WITHOUT
-# declaring nodata in its profile passes straight through into the z-scaling at
-# build_prediction.py:104 and saturates the logistic.
-@pytest.mark.xfail(
-    strict=True,
-    reason="Bug: an undeclared -9999 sentinel survives the scorer's magnitude filter; strict=True turns this red once sentinel handling is added so the xfail can be deleted.",
-)
-def test_undeclared_sentinel_should_not_reach_the_z_scaling(tmp_path: Path) -> None:
+# FIXED (was FINDING F6): rd() now maps exact -9999.0 to NaN after the magnitude
+# filter, so an undeclared sentinel cannot reach the z-scaling.
+def test_undeclared_sentinel_does_not_reach_the_z_scaling(tmp_path: Path) -> None:
     """Invariant: a -9999 sentinel must never reach the z-scaling, because it becomes a z-score of about -110 and pins that cell's predicted probability at a boundary value."""
     values = np.array([[1000.0, 1100.0], [-9999.0, 1200.0]], dtype=np.float32)
     path = _write_raster(tmp_path / "dem_undeclared.tif", values, nodata=None)
@@ -144,14 +136,18 @@ def test_undeclared_sentinel_should_not_reach_the_z_scaling(tmp_path: Path) -> N
     assert np.isnan(cleaned[1, 0])
 
 
-def test_undeclared_sentinel_produces_an_absurd_z_score(tmp_path: Path) -> None:
-    """Invariant: the surviving sentinel must be shown to yield a physically impossible z-score, so the xfail above is understood as a real numerical hazard rather than a style nit."""
+def test_undeclared_sentinel_produces_an_absurd_z_score_without_the_backstop(tmp_path: Path) -> None:
+    """Invariant: without the F6 backstop, a surviving sentinel yields a physically impossible z-score -- this pins why the backstop line must never be removed."""
     values = np.array([[1000.0, 1100.0], [-9999.0, 1200.0]], dtype=np.float32)
     path = _write_raster(tmp_path / "dem_undeclared.tif", values, nodata=None)
 
-    cleaned = _clean_like_build_prediction(path)
+    # Pre-fix cleaning: masked read + magnitude filter only, no -9999 backstop.
+    with rasterio.open(path) as src:
+        unguarded = src.read(1, masked=True).astype("float64").filled(np.nan)
+    unguarded[np.abs(unguarded) > 1e5] = np.nan
+
     elevation_mean, elevation_sd = 1000.0, 100.0
-    z_sentinel = (cleaned[1, 0] - elevation_mean) / elevation_sd
+    z_sentinel = (unguarded[1, 0] - elevation_mean) / elevation_sd
 
     assert not np.isnan(z_sentinel)
     assert z_sentinel < -100.0

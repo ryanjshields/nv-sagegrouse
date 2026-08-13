@@ -28,6 +28,7 @@ if ("dist_paved_m" %in% names(rsf)) {
   rsf$scale_UnpavedProximity <- as.numeric(scale(rsf$dist_unpaved_m))
 }
 rsf$scale_Elevation      <- as.numeric(scale(rsf$elevation))
+# Hazard: rsf$tri stores VRM (Sappington 2007), not Riley TRI; never re-point this at nv_tri_5070.tif.
 rsf$scale_Ruggedness     <- as.numeric(scale(rsf$tri))
 rsf$scale_Slope          <- as.numeric(scale(rsf$slope))
 rsf$Direction            <- as.factor(rsf$direction)          # ref = "E" (alphabetical), as in 2023
@@ -95,9 +96,13 @@ cv_auc <- sapply(1:5, function(k) {
   auc(as.numeric(as.character(rsf$Use[folds == k])), predict(fit, rsf[folds == k, ], type = "response"))
 })
 y <- as.numeric(as.character(rsf$Use))
-dec <- cut(p_full, quantile(p_full, seq(0, 1, 0.1)), include.lowest = TRUE, labels = FALSE)
-calib <- data.frame(decile = 1:10,
-                    mean_predicted = tapply(p_full, dec, mean),
+dec <- cut(p_full, unique(quantile(p_full, seq(0, 1, 0.1))), include.lowest = TRUE, labels = FALSE)
+# Tied predictions collapse quantile breaks; unique() lets cut() proceed, and
+# decile must then follow the realized level count -- a hardcoded 1:10 would
+# recycle silently whenever the collapsed count divides 10.
+tp <- tapply(p_full, dec, mean)
+calib <- data.frame(decile = seq_along(tp),
+                    mean_predicted = tp,
                     observed_rate  = tapply(y, dec, mean))
 write.csv(calib, file.path(root, "reports/v4/calibration.csv"), row.names = FALSE)
 diag_df <- data.frame(metric = c("AUC (full model average)", "AUC (5-fold CV, top model)", "CV sd"),

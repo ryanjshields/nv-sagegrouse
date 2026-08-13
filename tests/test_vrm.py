@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import numpy as np
-import pytest
 from numpy.testing import assert_allclose
 from scipy.ndimage import uniform_filter
 
@@ -19,17 +18,26 @@ def _as_matching_2d_arrays(slope_deg: np.ndarray, aspect_deg: np.ndarray) -> tup
 
 
 def vrm_from_degrees(slope_deg: np.ndarray, aspect_deg: np.ndarray) -> np.ndarray:
+    """Mirror of build_vrm.py after the F5 fix: valid-count-weighted focal mean."""
     slope, aspect = _as_matching_2d_arrays(slope_deg, aspect_deg)
-    slope_rad = np.deg2rad(slope)
-    aspect_rad = np.deg2rad(aspect)
+    valid = np.isfinite(slope) & np.isfinite(aspect) & (slope > -9998) & (aspect > -9998)
+    slope_rad = np.deg2rad(np.where(valid, slope, 0.0))
+    aspect_rad = np.deg2rad(np.where(valid, aspect, 0.0))
     xy = np.sin(slope_rad)
     x = xy * np.sin(aspect_rad)
     y = xy * np.cos(aspect_rad)
     z = np.cos(slope_rad)
-    rx = uniform_filter(x, size=3, mode="nearest")
-    ry = uniform_filter(y, size=3, mode="nearest")
-    rz = uniform_filter(z, size=3, mode="nearest")
-    return 1.0 - np.sqrt(rx**2 + ry**2 + rz**2)
+    n = uniform_filter(valid.astype(np.float64), size=3, mode="nearest")
+
+    def fmean(component: np.ndarray) -> np.ndarray:
+        s = uniform_filter(np.where(valid, component, 0.0), size=3, mode="nearest")
+        with np.errstate(invalid="ignore", divide="ignore"):
+            return np.where(n > 0, s / n, 0.0)
+
+    rx, ry, rz = fmean(x), fmean(y), fmean(z)
+    vrm = 1.0 - np.sqrt(rx**2 + ry**2 + rz**2)
+    vrm[~valid] = -9999.0
+    return vrm
 
 
 def blocked_vrm_from_degrees(slope_deg: np.ndarray, aspect_deg: np.ndarray, block_rows: int) -> np.ndarray:
@@ -104,11 +112,9 @@ def test_vrm_stays_within_unit_interval_up_to_roundoff() -> None:
     assert np.all(vrm <= 1.0 + 1e-12)
 
 
-# FINDING: pipeline/build_vrm.py:34-35 feeds raw -9999 nodata values through deg2rad/sin/cos into the 3x3 focal mean, and pipeline/build_vrm.py:27 writes nodata=None so downstream masked reads cannot recover the missing-data boundary.
-@pytest.mark.xfail(
-    strict=True,
-    reason="Bug: nodata cells should be excluded from the VRM neighborhood mean; strict=True makes this turn red once the pipeline is fixed so the xfail can be removed.",
-)
+# FIXED (was FINDING F5): build_vrm.py now excludes nodata cells from the focal
+# mean via a valid-count-weighted filter, declares nodata=-9999 in the profile,
+# and writes -9999 at the nodata cell itself.
 def test_nodata_does_not_poison_neighboring_vrm_cells() -> None:
     """Invariant: one nodata cell must not perturb neighboring VRM values because missing slope/aspect is not terrain roughness."""
     slope = np.full((9, 9), 30.0, dtype=np.float64)
@@ -120,6 +126,7 @@ def test_nodata_does_not_poison_neighboring_vrm_cells() -> None:
     neighbor_mask[3:6, 3:6] = True
     neighbor_mask[4, 4] = False
     assert_allclose(vrm[neighbor_mask], 0.0, rtol=0.0, atol=1e-12)
+    assert vrm[4, 4] == -9999.0
 
 
 def test_block_halo_matches_whole_array_computation() -> None:

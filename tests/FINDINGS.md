@@ -383,5 +383,71 @@ Recorded so nobody "fixes" these into bugs:
 - **Formula verbatim-ness CLOSED** — `fit_models.R:45-56` compared directly
   against `history/ModAvg_ActiveOnly_LandJournal.R:216-227`: term-for-term
   identical, m1–m12, same order (whitespace and `=`/`<-` only).
-- **F3–F8, F10–F16 OPEN** — pipeline-code changes; Ryan's call per the
-  surgical-fixes rule. The strict xfail tests will flip red when fixed.
+- **F3/F4/F11 FIXED (one root-cause gate)** — `extract_covariates.py` now runs
+  `reject_invalid()` after every raster-sampling step: any NaN or ≤ −9998 value
+  in a numeric covariate column exits nonzero with per-column counts
+  (`INGESTION_GATE_FAILED`), so a sentinel can never be classified as North/Flat
+  (F3/F4) or reach the z-scaling moments (F11). `direction()` additionally
+  raises `ValueError` on invalid aspect as belt-and-suspenders. Verified no-op
+  on current data: zero sentinels/NaN across all 7,898 design rows. All three
+  xfails flipped to passing raises-tests.
+- **F5 FIXED** — `build_vrm.py` now does masked reads and a valid-count-weighted
+  focal mean (nodata contributes nothing to neighbors), writes −9999 at invalid
+  cells, and declares `nodata=-9999.0` in the profile. Raster rebuilt statewide.
+  Blast radius measured: max |Δ| at the 7,898 design points vs the stored `tri`
+  column = 2.3e-13 (float associativity, not the halo) — no refit needed; the
+  frozen betas remain exact. xfail flipped.
+- **F6 FIXED** — `build_prediction.py` `rd()`/`rd_eq1()` map exact −9999.0 to
+  NaN after the magnitude filter, so an undeclared sentinel cannot reach the
+  z-scaling. xfail flipped; the hazard-demo test now pins the pre-backstop path.
+- **F7 FIXED** — `boyce.py` filters `src.nodata` from the area array in addition
+  to the −9999 convention. xfail flipped.
+- **F8 FIXED** — `boyce.py` raises `SystemExit("BOYCE_DEGENERATE…")` on a
+  non-finite index instead of writing a nan headline into the artifacts.
+- **F10 FIXED** — `boyce.py` clips values above the 99.9th-percentile ceiling
+  into the top window and makes the final window upper-inclusive, so the
+  highest-suitability leks are counted instead of excluded. This is the one fix
+  that legitimately moves a published number (the Boyce index); the regenerated
+  value is propagated to the paper.
+- **F12 FIXED** — `validate_spatial.R` uses the exact defensive
+  Shrubland-reference fallback from `fit_models.R` (character-identical line).
+  Seeded folds reproduce exactly (0.777/0.834/0.835/0.744/0.812).
+- **F13 FIXED** — `validate_spatial.R` looks up the random-fold AUC by metric
+  name with a `stopifnot` arity guard; returns the identical value
+  (0.799831009900665) the positional index produced.
+- **F14 FIXED (in `fit_models.R`, deepened by cross-vendor audit)** —
+  calibration `cut()` breaks wrapped in `unique()`, AND `decile` switched from
+  a hardcoded `1:10` to `seq_along(tp)`. The audit (Cato/GPT-5.4) proved by
+  execution that `unique()` alone converts the old loud `cut()` error into a
+  silent data.frame recycle whenever the collapsed level count divides 10 —
+  a defensive wrapper that made the tied-break case *worse*. With `seq_along`
+  the table follows the realized level count. Provably inert on current data:
+  `calibration.csv` holds 10 distinct rows, so the stored breaks are unique,
+  `unique()` is the identity, and `seq_along` of a length-10 result is `1:10`.
+  `fit_models.R` was NOT re-run (no refit); the frozen artifacts remain the
+  product of behaviorally identical code on the stored inputs.
+- **F15 FIXED** — dead `cell_km2` / `n_valid_full` assignments deleted.
+- **F16 DOCUMENTED** — comment above `scale_Ruggedness` in `fit_models.R`: the
+  `tri` column carries VRM (Sappington 2007), never re-point it at
+  `nv_tri_5070.tif`. No rename (surgical-fixes rule).
+- **Not-investigated items closed** — `rng=99` documented as deliberately
+  independent of the design seed; `validate_usgs.py` pins the expected release
+  filename (`GrSG_Spring_Selection_Categories.tif`) with a loud-warning keyword
+  fallback plus a cache-first guard (a cached raster skips the flaky
+  ScienceBase discovery API entirely; known limits: no checksum on the cached
+  copy). Zero xfail markers remain in the suite (75 passed).
+- **Cross-vendor audit (Cato/GPT-5.4, post-fix)** — verdict CONCERNS, all
+  actionable items resolved before push: (a) the F14 recycle hazard above;
+  (b) Boyce delta attribution isolated by experiment — pre-F10 window logic
+  rerun against the REBUILT raster reproduces the old top P/E to all digits
+  (6.24892010819103, F5 contribution exactly 0.0), so the 6.25 → 5.98 move is
+  entirely F10 and the F5 halo demonstrably never touched the Boyce inputs;
+  (c) `p_used` now gets the same `src.nodata` scrub as `area` (symmetric F7);
+  (d) test_boyce mirror gained boyce.py's p_used pre-filter order and the flip
+  test now asserts the top window survives into the written P/E ladder;
+  (e) the gate mirror signature now matches the pipeline's explicit-column-list
+  semantics, with a test documenting that unlisted columns pass unchecked.
+  Accepted-as-noted (low): checker's Boyce-claim rule is now a two-sided
+  5.5–6.5 band pinning the "roughly six times" prose — a legitimate future
+  rise past the band must change prose and rule together, which is the
+  checker's job; cache-first raster is trusted without a checksum.

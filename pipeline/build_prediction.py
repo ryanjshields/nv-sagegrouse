@@ -72,6 +72,7 @@ eq1_src = rasterio.open(D / "dem/nv_rugg_5070.tif")
 def rd_eq1(win):
     a = eq1_src.read(1, window=win, masked=True).astype("float64").filled(np.nan)
     a[np.abs(a) > 1e5] = np.nan
+    a[a == -9999.0] = np.nan   # FINDINGS F6: |−9999| < 1e5, so an undeclared sentinel needs its own backstop
     return a
 ref = srcs["dem"]
 H, W = ref.height, ref.width
@@ -95,6 +96,7 @@ for row0 in range(0, H, BLOCK):
     def rd(k):
         a = srcs[k].read(1, window=win, masked=True).astype("float64").filled(np.nan)
         a[np.abs(a) > 1e5] = np.nan
+        a[a == -9999.0] = np.nan   # FINDINGS F6: catch a -9999 sentinel even when the raster fails to declare it
         return a
     dem, slope, aspect, vrm, curv, dist = rd("dem"), rd("slope"), rd("aspect"), rd("vrm"), rd("curv"), rd("distroad")
     if RUGG_MODE == "eq1binary":
@@ -151,8 +153,6 @@ cbar.ax.set_yticklabels(["very low", "low", "moderate", "high", "very high"], fo
 fig.savefig(FIGS / f"prediction_map_{TAG}.png", dpi=150, bbox_inches="tight")
 plt.close(fig)
 
-cell_km2 = (30 * 30) / 1e6
-n_valid_full = None
 labels = ["very low", "low", "moderate", "high", "very high"]
 counts = [int(np.nansum(bins == i)) for i in range(5)]
 tot = sum(counts)

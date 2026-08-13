@@ -21,7 +21,7 @@ veg <- as.character(rsf$evt_phys); veg[is.na(veg) | veg == ""] <- "Other"
 tab <- table(veg); veg[veg %in% names(tab[tab < 10])] <- "Other"
 used_tab <- table(veg[rsf$use == 1])
 veg[veg %in% setdiff(unique(veg), names(used_tab[used_tab >= 5]))] <- "Other"
-rsf$Vegetation <- relevel(as.factor(veg), ref = "Shrubland")
+rsf$Vegetation <- {rf <- if ("Shrubland" %in% veg) "Shrubland" else names(sort(table(veg), decreasing=TRUE))[1]; relevel(as.factor(veg), ref = rf)}
 rsf$scale_PavedProximity   <- as.numeric(scale(rsf$dist_paved_m))
 rsf$scale_UnpavedProximity <- as.numeric(scale(rsf$dist_unpaved_m))
 
@@ -54,13 +54,16 @@ used <- rsf[rsf$use == 1, c("lekid", "p_hat")]
 m <- merge(used, leks[, c("LEKID", "PEAKMALE")], by.x = "lekid", by.y = "LEKID")
 m <- m[!is.na(m$PEAKMALE) & m$PEAKMALE > 0, ]
 size_cor <- cor(m$p_hat, m$PEAKMALE, method = "spearman")
+diag_df <- read.csv(file.path(root, "reports/v4/diagnostics.csv"))
+random_fold_auc <- diag_df$value[diag_df$metric == "AUC (5-fold CV, top model)"]
+stopifnot(length(random_fold_auc) == 1)
 
 out <- data.frame(
   metric = c(paste0("spatial-block AUC fold ", 1:5), "spatial-block AUC mean",
              "spatial-block AUC sd", "random-fold AUC (reference)",
              "lek-size Spearman (p_hat vs PEAKMALE)", "n leks with counts"),
   value = c(round(sp_auc, 3), round(mean(sp_auc), 3), round(sd(sp_auc), 3),
-            read.csv(file.path(root, "reports/v4/diagnostics.csv"))$value[2],
+            random_fold_auc,
             round(size_cor, 3), nrow(m)))
 write.csv(out, file.path(root, "reports/v4/spatial_validation.csv"), row.names = FALSE)
 cat("spatial-block AUC:", round(mean(sp_auc), 3), "+/-", round(sd(sp_auc), 3),
